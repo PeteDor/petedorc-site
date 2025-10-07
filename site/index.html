@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)</title>
+  <meta name="description" content="Designing resilient, cost‑efficient cloud systems on AWS. Multi‑cloud fluent—networking, serverless, and AI workloads—with measurable results." />
+  <link rel="canonical" href="https://petedorc.com/" />
+  <meta name="theme-color" content="#0B0D0F" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)" />
+  <meta property="og:description" content="Designing resilient, cost‑efficient cloud systems on AWS with measurable results." />
+  <meta property="og:url" content="https://petedorc.com/" />
+  <meta property="og:image" content="/og/petedorc-og.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)" />
+  <meta name="twitter:description" content="Designing resilient, cost‑efficient cloud systems on AWS with measurable results." />
+  <meta name="twitter:image" content="/og/petedorc-og.jpg" />
+  <!-- Fonts (subset + swap in production) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <!-- Minimal CSS -->
+  <style>
+    :root{
+      --bg:#0B0D0F; --surface:#111418; --text:#E6EAF2; --muted:#9AA7B2;
+      --a:#00B3A4; --b:#6CA0FF; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+      --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px; --space-12:48px; --space-16:64px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
+    a{color:var(--a);text-decoration:none}
+    a:focus,button:focus,input:focus,select:focus,textarea:focus{outline:2px solid var(--b);outline-offset:2px}
+    .container{max-width:1120px;margin:0 auto;padding:0 var(--space-4)}
+    header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0}
+    .brand{display:flex;gap:var(--space-3);align-items:center}
+    .brand .wordmark{font-weight:700;letter-spacing:.2px}
+    .wordmark small{color:var(--muted);font-weight:500;margin-left:6px}
+    .navlinks{display:flex;gap:var(--space-4)}
+    .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
+    .btn:hover{background:#151a21}
+    .btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}
+    .skip{position:absolute;left:-9999px}
+    .skip:focus{left:var(--space-4);top:var(--space-4);background:#000;padding:8px 12px;border-radius:8px}
+    /* Hero */
+    .hero{padding:var(--space-16) 0 var(--space-12)}
+    .eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}
+    h1{font-size:32px;margin:12px 0 8px}
+    .sub{font-size:18px;color:var(--muted);max-width:62ch}
+    .cta-row{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-6)}
+    .proof{display:flex;gap:var(--space-6);flex-wrap:wrap;margin-top:var(--space-6);align-items:center}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:var(--muted);font-size:14px}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--a)}
+    /* Sections */
+    section{padding:var(--space-16) 0;border-top:1px solid #141a22}
+    section h2{font-size:24px;margin:0 0 var(--space-6)}
+    .grid{display:grid;gap:var(--space-6)}
+    .grid.projects{grid-template-columns:repeat(12,1fr)}
+    .card{grid-column:span 12;background:var(--surface);border:1px solid #1a1f26;border-radius:var(--radius);padding:var(--space-6);box-shadow:var(--shadow)}
+    .card:hover{border-color:#273040}
+    .card h3{margin:0 0 8px;font-size:20px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+    .metrics{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .metric{background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:4px 10px;font-size:13px}
+    .stack{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .tag{border:1px solid #263040;border-radius:999px;padding:2px 8px;color:#c7d2e0;font-size:12px}
+    .right-rail{display:flex;gap:var(--space-6);flex-wrap:wrap}
+    /* Search + Filters */
+    .filters{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-6)}
+    .input{background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:10px 12px;color:var(--text)}
+    .select{appearance:none;background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:10px 12px;color:var(--text)}
+    /* Resume */
+    .resume{background:linear-gradient(180deg,#0b0d0f,#0e1116)}
+    .resume .dl{display:flex;gap:var(--space-4);align-items:center}
+    /* Contact */
+    form{display:grid;gap:12px;max-width:640px}
+    label{display:grid;gap:6px}
+    input,textarea{background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:12px;color:var(--text)}
+    textarea{min-height:140px}
+    .status{margin-top:8px;font-size:14px;color:var(--muted)}
+    footer{padding:var(--space-12) 0;color:var(--muted)}
+    /* Responsive */
+    @media(min-width:720px){
+      h1{font-size:40px}
+      .card{grid-column:span 6}
+    }
+    @media(min-width:1040px){
+      .card{grid-column:span 4}
+    }
+    /* Print tweaks for resume page section */
+    @media print {
+      header, .hero, #projects, #docs, #contact, footer{display:none}
+      #resume{border:0;padding:0}
+      body{background:#fff;color:#000}
+    }
+    /* Tooltip */
+    .tip{position:relative; border-bottom:1px dotted var(--muted); cursor:help;}
+    .tip:focus{outline:2px solid var(--b); outline-offset:2px;}
+    .tip::after{content:attr(data-tip); position:absolute; left:0; top:120%; transform:translateY(8px); background:#0f1318; color:var(--text); border:1px solid #1f2632; border-radius:10px; padding:10px 12px; width:min(560px, 90vw); box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .15s ease, transform .15s ease; z-index:30; line-height:1.35; font-size:14px;}
+    .tip::before{content:''; position:absolute; left:10px; top:120%; transform:translateY(0); border:6px solid transparent; border-bottom-color:#1f2632; opacity:0; transition:opacity .15s ease;}
+    .tip:hover::after,.tip:focus::after{opacity:1; transform:translateY(0);}
+    .tip:hover::before,.tip:focus::before{opacity:1;}
+  </style>
+  <!-- JSON-LD: Person + Website -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Peterson Dorcelus",
+    "alternateName": "Pete Dorcelus",
+    "url": "https://petedorc.com/",
+    "jobTitle": "Senior Cloud Architect",
+    "sameAs": [
+      "https://github.com/PeteDor",
+      "https://www.linkedin.com/in/petersondorcelus/"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <div class="wordmark">petedorc<span style="color:var(--a)">.com</span> <small>Cloud Architect</small></div>
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="#projects">Projects</a>
+          <a role="menuitem" href="#resume">Resume</a>
+          <a role="menuitem" href="#docs">Docs</a>
+          <a role="menuitem" href="#search" title="Press / to search">Search</a>
+          <a role="menuitem" href="#contact" class="btn">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero container" aria-label="Intro">
+      <div class="eyebrow">Available for Staff/Senior Cloud Architect roles</div>
+      <h1>Designing resilient, cost‑efficient cloud systems on AWS.</h1>
+      <p class="sub">Multi‑cloud fluent—networking, serverless, and AI workloads—with measurable results. <span class="tip" tabindex="0" data-tip="DoD 8140 refers to Department of Defense Directive 8140.01, which establishes a comprehensive qualification program for the DoD cyber workforce by replacing DoD 8570. It mandates that military personnel, civilians, and contractors performing cyber work meet specific training and certification requirements based on their defined roles within the DoD Cyber Workforce Framework (DCWF). The program emphasizes continuous professional development and allows for qualifications through experience and training, not just traditional certifications.">DoD 8140</span> compliant, GovCloud‑ready.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#projects">View Projects</a>
+        <a class="btn" href="#resume">Download Resume</a>
+        <a class="btn" href="https://github.com/PeteDor" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+      <div class="proof" aria-label="Proof strip">
+        <div class="chip"><span class="dot" aria-hidden="true"></span> AWS SAA‑C03</div>
+        <div class="chip"><span class="dot" aria-hidden="true"></span> CCNP Enterprise</div>
+        <div class="chip"><span class="dot" aria-hidden="true"></span> USACE/DoD Experience</div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="container" aria-labelledby="projects-h">
+      <h2 id="projects-h">Projects</h2>
+      <div class="filters" id="search">
+        <label for="q" class="sr-only">Search projects</label>
+        <input id="q" class="input" type="search" placeholder="Search projects (press /)" aria-label="Search projects" />
+        <select id="filter-cloud" class="select" aria-label="Filter by cloud">
+          <option value="">All clouds</option>
+          <option>AWS</option>
+          <option>Azure</option>
+          <option>GCP</option>
+        </select>
+        <select id="filter-domain" class="select" aria-label="Filter by domain">
+          <option value="">All domains</option>
+          <option>Serverless</option>
+          <option>Networking</option>
+          <option>AI/ML</option>
+          <option>Security</option>
+          <option>Observability</option>
+        </select>
+        <select id="sort" class="select" aria-label="Sort projects">
+          <option value="impact" selected>Most impactful</option>
+          <option value="recent">Most recent</option>
+        </select>
+      </div>
+
+      <div class="grid projects" id="project-list" role="list">
+        <!-- Project Card 1 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="Serverless" data-impact="100" data-date="2025-09-01">
+          <h3><a href="/case-studies/s3-cloudfront-edge-security.html">S3 + CloudFront Portfolio with Edge Security</a></h3>
+          <p class="meta">Static site on S3, CloudFront, ACM, Route 53. CloudFront Functions for redirects & headers; optional Lambda@Edge for signed URLs.</p>
+          <div class="metrics">
+            <span class="metric">LCP ≤ 1.8s</span>
+            <span class="metric">INP ≤ 160ms</span>
+            <span class="metric">CLS ≤ 0.05</span>
+          </div>
+          <div class="stack">
+            <span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Route 53</span><span class="tag">Lambda@Edge</span>
+          </div>
+        </article>
+        <!-- Project Card 2 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="AI/ML" data-impact="85" data-date="2025-08-16">
+          <h3><a href="/case-studies/polly-rekognition-demo.html">Polly + Rekognition Serverless Demos</a></h3>
+          <p class="meta">API Gateway + Lambda with Cognito Hosted UI, per‑IP throttling (WAF), and no persistent storage. Rate‑limited public demo.</p>
+          <div class="metrics">
+            <span class="metric">Cost/mo ≈ $< 5</span>
+            <span class="metric">P95 480ms → 95ms</span>
+          </div>
+          <div class="stack">
+            <span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">Cognito</span><span class="tag">WAF</span><span class="tag">SSM</span>
+          </div>
+        </article>
+        <!-- Project Card 3 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="Networking" data-impact="90" data-date="2025-07-10">
+          <h3><a href="/case-studies/vpc-ha-reference.html">VPC HA Reference — ALB + Multi‑AZ + RDS</a></h3>
+          <p class="meta">Multi‑AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, SNS ops alerts.</p>
+          <div class="metrics">
+            <span class="metric">Uptime 99.9% → 99.99%</span>
+            <span class="metric">Cost/mo $1,240 → $410</span>
+          </div>
+          <div class="stack">
+            <span class="tag">VPC</span><span class="tag">ALB</span><span class="tag">ASG</span><span class="tag">RDS</span><span class="tag">CloudWatch</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Resume -->
+    <section id="resume" class="container resume" aria-labelledby="resume-h">
+      <h2 id="resume-h">Resume</h2>
+      <p>Human‑readable résumé with a printable layout. For ATS, use the downloadable PDF version.</p>
+      <p class="dl">
+        <a class="btn" href="/assets/Peterson-Dorcelus-Resume.pdf" download>Download PDF</a>
+        <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn Profile</a>
+      </p>
+      <div class="card" aria-label="Resume summary">
+        <strong>Summary.</strong> AWS Certified Solutions Architect – Associate and CCNP with 10+ years across cloud infra, networking, and secure DoD operations. <span class="tip" tabindex="0" data-tip="DoD 8140 refers to Department of Defense Directive 8140.01, which establishes a comprehensive qualification program for the DoD cyber workforce by replacing DoD 8570. It mandates that military personnel, civilians, and contractors performing cyber work meet specific training and certification requirements based on their defined roles within the DoD Cyber Workforce Framework (DCWF). The program emphasizes continuous professional development and allows for qualifications through experience and training, not just traditional certifications.">DoD 8140</span> compliant, GovCloud‑ready.
+      </div>
+    </section>
+
+    <!-- Docs -->
+    <section id="docs" class="container" aria-labelledby="docs-h">
+      <h2 id="docs-h">Docs</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="/docs/cloudfront-security-headers.html">CloudFront Security Headers — Pattern</a></h3>
+          <p class="meta">CSP, HSTS, Referrer‑Policy, Frame‑Options via CloudFront Functions. Includes code snippets.</p>
+        </article>
+        <article class="card">
+          <h3><a href="/docs/cognito-hosted-ui-notes.html">Cognito Hosted UI — Notes</a></h3>
+          <p class="meta">Hosted UI, OAuth flows, and Amplify Auth integration for gated demos.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="container" aria-labelledby="contact-h">
+      <h2 id="contact-h">Contact</h2>
+      <form id="contact-form" aria-describedby="contact-status">
+        <label>Full name
+          <input name="name" autocomplete="name" required />
+        </label>
+        <label>Email
+          <input name="email" type="email" autocomplete="email" required />
+        </label>
+        <label>Message
+          <textarea name="message" required></textarea>
+        </label>
+        <input type="text" name="company" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px" autocomplete="off" />
+        <button class="btn primary" type="submit">Send</button>
+        <div id="contact-status" class="status" role="status" aria-live="polite"></div>
+        <p class="status">Or email <a href="mailto:PDorcelus@gmail.com">PDorcelus@gmail.com</a>.</p>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="right-rail">
+        <span>© <span id="y"></span> Peterson “Pete” Dorcelus</span>
+        <span>Built with S3 + CloudFront. Deployed from GitHub.</span>
+        <span><a href="https://github.com/PeteDor" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a></span>
+      </div>
+      <!-- In CloudFront, add security headers via Function/Lambda@Edge. See docs/cf-headers. -->
+    </div>
+  </footer>
+
+  <script>
+    // Lightweight project search/filter/sort (no deps)
+    const $ = (s, d=document)=>d.querySelector(s); const $$=(s,d=document)=>Array.from(d.querySelectorAll(s));
+    const list = $('#project-list'); const items = $$('#project-list>.card');
+    const q = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
+    function apply(){
+      const term = (q.value||'').toLowerCase();
+      const cloud = (fc.value||'').toLowerCase();
+      const domain = (fd.value||'').toLowerCase();
+      let filtered = items.filter(it=>{
+        const text = it.textContent.toLowerCase();
+        const okQ = !term || text.includes(term);
+        const okC = !cloud || (it.dataset.cloud||'').toLowerCase().includes(cloud);
+        const okD = !domain || (it.dataset.domain||'').toLowerCase().includes(domain);
+        it.style.display = (okQ && okC && okD) ? '' : 'none';
+        return okQ && okC && okD;
+      });
+      filtered.sort((a,b)=>{
+        if(sort.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
+        return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
+      }).forEach(n=>list.appendChild(n));
+    }
+    [q, fc, fd, sort].forEach(el=>el.addEventListener('input', apply));
+    window.addEventListener('keydown', (e)=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA'){ e.preventDefault(); q.focus(); }});
+    apply();
+
+    // Contact form — replace apiUrl with your API Gateway invoke URL
+    const apiUrl = '';
+    const form = $('#contact-form'); const statusEl = $('#contact-status');
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      statusEl.textContent = 'Sending…';
+      const data = Object.fromEntries(new FormData(form));
+      if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); return; } // honeypot
+      try{
+        if(!apiUrl){
+          statusEl.innerHTML = 'Form backend not configured. Email <a href="mailto:PDorcelus@gmail.com">PDorcelus@gmail.com</a>.';
+          return;
+        }
+        const r = await fetch(apiUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+        if(r.ok){ statusEl.textContent = 'Thanks! I will reply shortly.'; form.reset(); }
+        else{ statusEl.textContent = 'Could not send right now. Please email me.'; }
+      }catch(err){ statusEl.textContent = 'Network error. Please email me.'; }
+    });
+
+    // Year
+    $('#y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
