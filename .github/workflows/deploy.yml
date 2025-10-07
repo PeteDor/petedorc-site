@@ -1,50 +1,25 @@
 name: Deploy petedorc.com
-
 on:
   push:
     branches: [ main ]
-    paths:
-      - "site/**"
+    paths: [ "site/**" ]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
+    permissions: { id-token: write, contents: read }
     env:
       AWS_REGION: us-east-1
       S3_BUCKET: petedorc-site
       CF_DIST_ID: E2V3LE90V78FWL
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Configure AWS (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::637423348409:role/GitHubDeployPetedorc
           aws-region: ${{ env.AWS_REGION }}
-
-      - name: Who am I?
-        run: aws sts get-caller-identity
-
-      - name: Show env + list CloudFront dists
-        run: |
-          echo "CF_DIST_ID=[$CF_DIST_ID]"
-          aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Domain:DomainName,Aliases:Aliases.Items}" --output table
-
-      - name: Sync to S3 (root)
+      - name: Sync to S3
         run: aws s3 sync site "s3://$S3_BUCKET" --delete
-
-      - name: Invalidate CloudFront (robust ID)
-        run: |
-          RAW="$CF_DIST_ID"
-          # keep only letters and digits (strips [, ], spaces, linebreaks, etc.)
-          ID="$(printf '%s' "$RAW" | tr -dc 'A-Za-z0-9')"
-          echo "Using CF dist ID: $ID"
-          aws cloudfront get-distribution --id "$ID"
-          aws cloudfront create-invalidation --distribution-id "$ID" --paths "/*"
-
+      - name: Invalidate CloudFront
+        run: aws cloudfront create-invalidation --distribution-id "$CF_DIST_ID" --paths "/*"
