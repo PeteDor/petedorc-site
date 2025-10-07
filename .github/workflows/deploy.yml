@@ -27,12 +27,7 @@ jobs:
 
       - name: Who am I?
         run: aws sts get-caller-identity
-
-      - name: Show env + list CloudFront dists
-        run: |
-          echo "CF_DIST_ID=$CF_DIST_ID"
-          aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Domain:DomainName,Aliases:Aliases.Items}" --output table
-
+      
       - name: Sync to S3 (root)
         run: aws s3 sync site "s3://$S3_BUCKET" --delete
 
