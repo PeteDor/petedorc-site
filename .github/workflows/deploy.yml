@@ -39,8 +39,12 @@ jobs:
       - name: Sync to S3 (root)
         run: aws s3 sync site "s3://$S3_BUCKET" --delete
 
-      - name: Invalidate CloudFront (trimmed ID)
+      - name: Invalidate CloudFront (robust ID)
         run: |
-          ID="$(echo "$CF_DIST_ID" | tr -d '[:space:]')"
+          RAW="$CF_DIST_ID"
+          # keep only letters and digits (strips [, ], spaces, linebreaks, etc.)
+          ID="$(printf '%s' "$RAW" | tr -dc 'A-Za-z0-9')"
+          echo "Using CF dist ID: $ID"
           aws cloudfront get-distribution --id "$ID"
           aws cloudfront create-invalidation --distribution-id "$ID" --paths "/*"
+
