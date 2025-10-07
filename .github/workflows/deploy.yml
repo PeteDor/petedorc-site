@@ -3,8 +3,9 @@ name: Deploy petedorc.com
 on:
   push:
     branches: [ main ]
-    paths: [ "site/**" ]
-  workflow_dispatch: {}
+    paths:
+      - "site/**"
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -16,8 +17,10 @@ jobs:
       AWS_REGION: us-east-1
       S3_BUCKET: petedorc-site
       CF_DIST_ID: E3VLE90V78FWL
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -25,16 +28,19 @@ jobs:
           role-to-assume: arn:aws:iam::637423348409:role/GitHubDeployPetedorc
           aws-region: ${{ env.AWS_REGION }}
 
-            - name: Who am I?
+      - name: Who am I?
         run: aws sts get-caller-identity
 
       - name: Show env + list CloudFront dists
         run: |
-          echo "CF_DIST_ID=[$CF_DIST_ID]"   # brackets make whitespace visible
+          echo "CF_DIST_ID=[$CF_DIST_ID]"
           aws cloudfront list-distributions --query "DistributionList.Items[].{Id:Id,Domain:DomainName,Aliases:Aliases.Items}" --output table
+
+      - name: Sync to S3 (root)
+        run: aws s3 sync site "s3://$S3_BUCKET" --delete
 
       - name: Invalidate CloudFront (trimmed ID)
         run: |
-          ID="$(echo "$CF_DIST_ID" | tr -d '[:space:]')"   # strip hidden whitespace/newlines
+          ID="$(echo "$CF_DIST_ID" | tr -d '[:space:]')"
           aws cloudfront get-distribution --id "$ID"
           aws cloudfront create-invalidation --distribution-id "$ID" --paths "/*"
