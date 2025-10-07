@@ -16,7 +16,7 @@ jobs:
     env:
       AWS_REGION: us-east-1
       S3_BUCKET: petedorc-site
-      CF_DIST_ID: E2VLE90V78FWL
+      CF_DIST_ID: E2V3LE90V78FWL
 
     steps:
       - name: Checkout
