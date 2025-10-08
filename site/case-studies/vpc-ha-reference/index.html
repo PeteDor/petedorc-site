@@ -1,97 +1,160 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.1">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>VPC HA Reference — ALB + Multi-AZ + RDS</title>
+
+  <meta name="theme-color" content="#0B0D0F"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root { --bg:#0B0D0F; --surface:#111418; --text:#E6EAF2; --muted:#9AA7B2; --a:#00B3A4; --b:#6CA0FF; --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35); }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+    a{color:var(--a);text-decoration:none}
+    header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}
+    nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}
+    .wordmark{font-weight:700}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
+    .btn:hover{background:#151a21}
+    .btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}
+    .container{max-width:1120px;margin:0 auto;padding:0 16px}
+    .hero{padding:48px 0 16px}
+    .eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}
+    .h1{font-size:32px;margin:8px 0}
+    .sub{color:var(--muted)}
+    .layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}
+    @media (min-width:960px){.layout{grid-template-columns:minmax(0,1fr) 320px}}
+    .rail{display:flex;flex-direction:column;gap:12px}
+    .chip,.metric,.tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
+    .metric{background:#0e141a;border:1px solid #1e2734}
+    .card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+    h2{font-size:22px;margin:0 0 8px}
+    .stack,.metrics{display:flex;gap:8px;flex-wrap:wrap}
+    .grid{display:grid;gap:16px}
+    .kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}
+    img{max-width:100%;border-radius:14px}
   </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"VPC HA Reference — ALB + Multi-AZ + RDS",
+    "author":{"@type":"Person","name":"Peterson Dorcelus"},
+    "about":"Highly available VPC reference architecture",
+    "mainEntityOfPage":"https://petedorc.com/case-studies/vpc-ha-reference/",
+    "datePublished":"2025-10-07",
+    "articleSection":["Networking","Reliability"]
+  }
+  </script>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!doctype html&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.googleapis.com"/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;style&gt;</span></p>
-<p class="p1"><span class="s1">:root{--bg:#0B0D0F;--surface:#111418;--text:#E6EAF2;--muted:#9AA7B2;--a:#00B3A4;--b:#6CA0FF;--radius:14px;--shadow:0 10px 30px rgba(0,0,0,.35)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}a{color:var(--a);text-decoration:none}header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}.wordmark{font-weight:700}.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid#1e293b;background:#12161c;box-shadow:var(--shadow)}.btn:hover{background:#151a21}.btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}.container{max-width:1120px;margin:0 auto;padding:0 16px}.hero{padding:48px 016px}.eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}.h1{font-size:32px;margin:8px 0 8px}.sub{color:var(--muted)}.layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}.rail{display:flex;flex-direction:column;gap:12px}.chip,.metric,.tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px10px;color:#c7d2e0;font-size:13px}.metric{background:#0e141a;border:1px solid #1e2734}.card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}h2{font-size:22px;margin:0 0 8px}.stack,.metrics{display:flex;gap:8px;flex-wrap:wrap}.grid{display:grid;gap:16px}.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}</span></p>
-<p class="p1"><span class="s1">@media (min-width: 960px){.layout{grid-template-columns:minmax(0,1fr) 320px}}</span></p>
-<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script type="application/ld+json"&gt;{</span></p>
-<p class="p1"><span class="s1">"@context":"https://schema.org","@type":"Article","headline":"VPC HA Reference — ALB + Multi‑AZ + RDS","author":{"@type":"Person","name":"Peterson Dorcelus"},"about":"Highly available VPC reference architecture","mainEntityOfPage":"https://petedorc.com/case-studies/vpc-ha-reference.html","datePublished":"2025-10-07","articleSection":["Networking","Reliability"]}</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;header&gt;</span></p>
-<p class="p1"><span class="s1">&lt;nav&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="wordmark"&gt;&lt;a href="/"&gt;petedorc&lt;span style="color:#00B3A4"&gt;.com&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="navlinks"&gt;&lt;a class="btn" href="/projects"&gt;Projects&lt;/a&gt;&lt;a class="btn" href="/contact"&gt;Contact&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/nav&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/header&gt;</span></p>
-<p class="p1"><span class="s1">&lt;main&gt;</span></p>
-<p class="p1"><span class="s1">&lt;section class="hero container"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="eyebrow"&gt;Case Study&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h1 class="h1"&gt;VPC HA Reference — ALB + Multi‑AZ + RDS&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1">&lt;p class="sub"&gt;Multi‑AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, and SNS ops alerts.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/section&gt;</span></p>
-<p class="p1"><span class="s1">&lt;section class="container layout"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;article class="content"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Context&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;p&gt;Target: a reusable baseline for reliable web apps with strict separation between public and private tiers and automated failover characteristics.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Architecture&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Two or three AZs; public subnets for ALB + NAT, private subnets for ASG + RDS&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Security groups and NACLs to enforce least privilege&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;CloudWatch alarms → SNS; SSM for parameters; Systems Manager for patching&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;figure class="card" style="padding:0"&gt;&lt;img src="/assets/diagrams/vpc-ha-reference.png" alt="VPC architecture with ALB, ASG, NAT, RDS across AZs" style="max-width:100%;border-radius:14px"/&gt;&lt;figcaption class="kbd"style="padding:12px"&gt;Diagram placeholder.&lt;/figcaption&gt;&lt;/figure&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Decisions &amp; Trade‑offs&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;RDS Multi‑AZ:&lt;/strong&gt; higher cost, but 99.99% DB SLA.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;NAT gateways per AZ:&lt;/strong&gt; improves resilience; increases cost.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;ASG warm pools:&lt;/strong&gt; faster scale‑out vs additional instance cost.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Results&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="metrics"&gt;&lt;span class="metric"&gt;Uptime 99.9% → 99.99%&lt;/span&gt;&lt;span class="metric"&gt;Cost/mo $1,240 → $410&lt;/span&gt;&lt;span class="metric"&gt;MTTR ↓ 40%&lt;/span&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Cost &amp; Ops&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Use Savings Plans or reserved instances for steady ASG capacity.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Right‑size instance families; consider Graviton.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Enable RDS storage autoscaling + Performance Insights.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h2&gt;Improvements&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Introduce AWS Backup vault + cross‑region copy.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Blueprint CDK stack with parameterized CIDRs and AZ count.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;li&gt;Blue/Green for RDS upgrades.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/article&gt;</span></p>
-<p class="p1"><span class="s1">&lt;aside class="rail"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Stack&lt;/strong&gt;&lt;div class="stack" style="margin-top:8px"&gt;&lt;spanclass="tag"&gt;VPC&lt;/span&gt;&lt;span class="tag"&gt;ALB&lt;/span&gt;&lt;span class="tag"&gt;ASG&lt;/span&gt;&lt;spanclass="tag"&gt;RDS&lt;/span&gt;&lt;span class="tag"&gt;CloudWatch&lt;/span&gt;&lt;span class="tag"&gt;SNS&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Repo&lt;/strong&gt;&lt;br/&gt;&lt;a href="https://github.com/PeteDor" target="_blank"rel="noopener"&gt;github.com/PeteDor&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Demo&lt;/strong&gt;&lt;br/&gt;&lt;a href="#" target="_blank" rel="noopener"&gt;(optional) demo link&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;a class="btn primary" href="/contact"&gt;Talk to me about this pattern&lt;/a&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/aside&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/section&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/main&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<header>
+  <nav>
+    <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
+    <div class="navlinks">
+      <a class="btn" href="/projects">Projects</a>
+      <a class="btn" href="/contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero container">
+    <div class="eyebrow">Case Study</div>
+    <h1 class="h1">VPC HA Reference — ALB + Multi-AZ + RDS</h1>
+    <p class="sub">Multi-AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, and SNS ops alerts.</p>
+  </section>
+
+  <section class="container layout">
+    <article class="content">
+      <div class="card">
+        <h2>Context</h2>
+        <p>Target: a reusable baseline for reliable web apps with strict separation between public and private tiers and automated failover characteristics.</p>
+      </div>
+
+      <div class="card">
+        <h2>Architecture</h2>
+        <ul>
+          <li>Two or three AZs; public subnets for ALB + NAT, private subnets for ASG + RDS</li>
+          <li>Security groups and NACLs to enforce least privilege</li>
+          <li>CloudWatch alarms → SNS; SSM for parameters; Systems Manager for patching</li>
+        </ul>
+
+        <!-- Remove this figure if you don't have the PNG yet -->
+        <figure class="card" style="padding:0">
+          <img src="/assets/diagrams/vpc-ha-reference.png" alt="VPC architecture with ALB, ASG, NAT, RDS across AZs">
+          <figcaption class="kbd" style="padding:12px">Diagram placeholder.</figcaption>
+        </figure>
+      </div>
+
+      <div class="card">
+        <h2>Decisions &amp; Trade-offs</h2>
+        <ul>
+          <li><strong>RDS Multi-AZ:</strong> higher cost, but 99.99% DB SLA.</li>
+          <li><strong>NAT gateways per AZ:</strong> improves resilience; increases cost.</li>
+          <li><strong>ASG warm pools:</strong> faster scale-out vs additional instance cost.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Results</h2>
+        <div class="metrics">
+          <span class="metric">Uptime 99.9% → 99.99%</span>
+          <span class="metric">Cost/mo $1,240 → $410</span>
+          <span class="metric">MTTR ↓ 40%</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Cost &amp; Ops</h2>
+        <ul>
+          <li>Use Savings Plans or reserved instances for steady ASG capacity.</li>
+          <li>Right-size instance families; consider Graviton.</li>
+          <li>Enable RDS storage autoscaling + Performance Insights.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Improvements</h2>
+        <ul>
+          <li>Introduce AWS Backup vault + cross-region copy.</li>
+          <li>Blueprint CDK stack with parameterized CIDRs and AZ count.</li>
+          <li>Blue/Green for RDS upgrades.</li>
+        </ul>
+      </div>
+    </article>
+
+    <aside class="rail">
+      <div class="card">
+        <strong>Stack</strong>
+        <div class="stack" style="margin-top:8px">
+          <span class="tag">VPC</span>
+          <span class="tag">ALB</span>
+          <span class="tag">ASG</span>
+          <span class="tag">RDS</span>
+          <span class="tag">CloudWatch</span>
+          <span class="tag">SNS</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Repo</strong><br/>
+        <a href="https://github.com/PeteDor" target="_blank" rel="noopener">github.com/PeteDor</a>
+      </div>
+
+      <div class="card">
+        <strong>Demo</strong><br/>
+        <a href="#" target="_blank" rel="noopener">(optional) demo link</a>
+      </div>
+
+      <a class="btn primary" href="/contact">Talk to me about this pattern</a>
+    </aside>
+  </section>
+</main>
 </body>
 </html>
