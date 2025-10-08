@@ -33,6 +33,7 @@
     html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
     a{color:var(--a);text-decoration:none}
+    img{max-width:100%}
     a:focus,button:focus,input:focus,select:focus,textarea:focus{outline:2px solid var(--b);outline-offset:2px}
     .container{max-width:1120px;margin:0 auto;padding:0 var(--space-4)}
     header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}
@@ -99,7 +100,16 @@
     }
     /* Reusable image style for cards */
     .card-img{
-      background:#fff;border:1px solid #1e2734;border-radius:12px;width:100%;height:auto;display:block;margin:8px 0 10px;}
+      background:#fff;
+      border:1px solid #1e2734;
+      border-radius:12px;
+      width:100%;
+      height:auto;
+      display:block;
+      margin:8px 0 10px;
+      aspect-ratio:16/9;          /* keeps the shape before the image paints */
+    }
+    .card .card-img{ max-height:none; } /* neutralize any generic card image caps */
     /* Tooltip */
     .tip{position:relative; border-bottom:1px dotted var(--muted); cursor:help;}
     .tip:focus{outline:2px solid var(--b); outline-offset:2px;}
@@ -107,6 +117,7 @@
     .tip::before{content:''; position:absolute; left:10px; top:120%; transform:translateY(0); border:6px solid transparent; border-bottom-color:#1f2632; opacity:0; transition:opacity .15s ease;}
     .tip:hover::after,.tip:focus::after{opacity:1; transform:translateY(0);}
     .tip:hover::before,.tip:focus::before{opacity:1;}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
   <!-- JSON-LD: Person + Website -->
   <script type="application/ld+json">
@@ -189,18 +200,17 @@
       </div>
       <div class="grid projects" id="project-list" role="list">
         <!-- Project Card 1 -->
-        <article class="card" role="listitem" data-cloud="AWS" data-domain="Serverless" data-impact="100" data-date="2025-09-01">
-          <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>   
-        <picture>
-          <source srcset="/assets/diagrams/s3-cloudfront-edge-security.avif" type="image/avif">
-          <source srcset="/assets/diagrams/s3-cloudfront-edge-security.webp" type="image/webp">
-          <img src="/assets/diagrams/s3-cloudfront-edge-security.png"
-                alt="S3 + CloudFront Edge Security diagram"
-                class="card-img"
-                width="1280" height="720"
-                loading="lazy" decoding="async"
-              />
-        </picture>
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="Security" data-impact="95" data-date="2025-10-08">
+          <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>
+          <picture>
+            <img
+              src="/assets/diagrams/s3-cloudfront-edge-security.png"
+              alt="S3 + CloudFront Edge Security diagram"
+              class="card-img"
+              width="1280" height="720"
+              loading="lazy" decoding="async"
+            />
+          </picture>
           <p class="meta">Static site on S3, CloudFront, ACM, Route 53. CloudFront Functions for redirects & headers; optional Lambda@Edge for signed URLs.</p>
           <div class="metrics">
             <span class="metric">LCP ≤ 1.8s</span>
@@ -213,7 +223,7 @@
         </article>
         <!-- Project Card 2 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="AI/ML" data-impact="85" data-date="2025-08-16">
-          <h3><a href="/case-studies/polly-rekognition-demo">Polly + Rekognition Serverless Demos</a></h3>
+          <h3><a href="/case-studies/polly-rekognition-demo/">Polly + Rekognition Serverless Demos</a></h3>
           <p class="meta">API Gateway + Lambda with Cognito Hosted UI, per‑IP throttling (WAF), and no persistent storage. Rate‑limited public demo.</p>
           <div class="metrics">
             <span class="metric">Cost/mo ≈ $< 5</span>
@@ -225,7 +235,7 @@
         </article>
         <!-- Project Card 3 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Networking" data-impact="90" data-date="2025-07-10">
-          <h3><a href="/case-studies/vpc-ha-reference">VPC HA Reference — ALB + Multi‑AZ + RDS</a></h3>
+          <h3><a href="/case-studies/vpc-ha-reference/">VPC HA Reference — ALB + Multi‑AZ + RDS</a></h3>
           <p class="meta">Multi‑AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, SNS ops alerts.</p>
           <div class="metrics">
             <span class="metric">Uptime 99.9% → 99.99%</span>
