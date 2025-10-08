@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Cognito Hosted UI — Notes</title>
+<meta name="description" content="Quick reference for Amazon Cognito Hosted UI, OAuth flows, and Amplify configuration."/>
+<link rel="canonical" href="https://petedorc.com/docs/cognito-hosted-ui-notes.html"/>
+<style>
+  body{margin:0;background:#0B0D0F;color:#E6EAF2;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  .container{max-width:960px;margin:0 auto;padding:32px}
+  a{color:#00B3A4;text-decoration:none}
+  pre{background:#0f1318;border:1px solid #1f2632;padding:16px;border-radius:12px;overflow:auto}
+  code,kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  h1{margin:0 0 12px}
+  .muted{color:#9AA7B2}
+  .card{background:#111418;border:1px solid #1a1f26;border-radius:14px;padding:20px;margin:18px 0}
+  .back{display:inline-block;margin:6px 0 18px}
+  img{max-width:100%}
+</style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← Back to home</a>
+    <h1>Cognito Hosted UI — Notes</h1>
+    <p class="muted">Set up user auth quickly with the built-in Hosted UI. Use OAuth 2.0 code flow with PKCE for web apps.</p>
+
+    <div class="card">
+      <h2>Key endpoints</h2>
+      <pre><code>https://&lt;your_domain&gt;.auth.&lt;region&gt;.amazoncognito.com/login
+https://&lt;your_domain&gt;.auth.&lt;region&gt;.amazoncognito.com/oauth2/authorize
+https://&lt;your_domain&gt;.auth.&lt;region&gt;.amazoncognito.com/oauth2/token
+https://&lt;your_domain&gt;.auth.&lt;region&gt;.amazoncognito.com/logout
+</code></pre>
+      <p>Redirect URLs must be whitelisted in the <em>App client</em> settings.</p>
+    </div>
+
+    <div class="card">
+      <h2>Amplify config (Web)</h2>
+      <pre><code class="language-js">import { Amplify } from 'aws-amplify';
+
+Amplify.configure({
+  Auth: {
+    region: 'us-east-1',
+    userPoolId: 'us-east-1_xxxxx',
+    userPoolWebClientId: 'xxxxxxxxxxxxxxxxxxxx',
+    oauth: {
+      domain: 'your-domain.auth.us-east-1.amazoncognito.com',
+      scope: ['email','openid','profile'],
+      redirectSignIn: 'https://petedorc.com/callback/',
+      redirectSignOut: 'https://petedorc.com/',
+      responseType: 'code'
+    }
+  }
+});</code></pre>
+      <p>Use the <strong>code</strong> flow with PKCE in browsers. For API calls, exchange the code for tokens at the <code>/oauth2/token</code> endpoint.</p>
+    </div>
+
+    <div class="card">
+      <h2>Lock down the Hosted UI</h2>
+      <ul>
+        <li>Enable <em>prevent user existence errors</em>.</li>
+        <li>Enforce MFA (SMS/TOTP) for higher assurance.</li>
+        <li>Use a custom domain (Route 53 + ACM) so cookies are first-party to your site.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
