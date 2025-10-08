@@ -1,5 +1,97 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>S3 + CloudFront Edge Security</title>
-<h1>S3 + CloudFront Edge Security</h1>
-<p>Coming soon.</p>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2685.1">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
+    span.s1 {font-kerning: none}
+  </style>
+</head>
+<body>
+<p class="p1"><span class="s1">&lt;!doctype html&gt;</span></p>
+<p class="p2"><span class="s1"></span><br></p>
+<p class="p1"><span class="s1">&lt;meta name="theme-color" content="#0B0D0F" /&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.googleapis.com"/&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/&gt;</span></p>
+<p class="p1"><span class="s1">&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/&gt;</span></p>
+<p class="p1"><span class="s1">&lt;style&gt;</span></p>
+<p class="p1"><span class="s1">:root{--bg:#0B0D0F;--surface:#111418;--text:#E6EAF2;--muted:#9AA7B2;--a:#00B3A4;--b:#6CA0FF;--radius:14px;--shadow:0 10px 30px rgba(0,0,0,.35)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}a{color:var(--a);text-decoration:none}header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}.wordmark{font-weight:700}.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid#1e293b;background:#12161c;box-shadow:var(--shadow)}.btn:hover{background:#151a21}.btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}.container{max-width:1120px;margin:0 auto;padding:0 16px}.hero{padding:48px 016px}.eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}.h1{font-size:32px;margin:8px 0 8px}.sub{color:var(--muted)}.layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}.rail{display:flex;flex-direction:column;gap:12px}.chip,.metric,.tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px10px;color:#c7d2e0;font-size:13px}.metric{background:#0e141a;border:1px solid #1e2734}.card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}h2{font-size:22px;margin:0 0 8px}.stack,.metrics{display:flex;gap:8px;flex-wrap:wrap}.grid{display:grid;gap:16px}.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}</span></p>
+<p class="p1"><span class="s1">@media (min-width: 960px){.layout{grid-template-columns:minmax(0,1fr) 320px}}</span></p>
+<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
+<p class="p1"><span class="s1">&lt;script type="application/ld+json"&gt;{</span></p>
+<p class="p1"><span class="s1">"@context":"https://schema.org","@type":"Article","headline":"Polly + Rekognition Serverless Demos","author":{"@type":"Person","name":"Peterson Dorcelus"},"about":"Serverless demos with Cognito authentication and WAF throttling","mainEntityOfPage":"https://petedorc.com/case-studies/polly-rekognition-demo.html","datePublished":"2025-10-07","articleSection":["Serverless","AI/ML"]}</span></p>
+<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
+<p class="p1"><span class="s1">&lt;body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;header&gt;</span></p>
+<p class="p1"><span class="s1">&lt;nav&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="wordmark"&gt;&lt;a href="/"&gt;petedorc&lt;span style="color:#00B3A4"&gt;.com&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="navlinks"&gt;&lt;a class="btn" href="/projects"&gt;Projects&lt;/a&gt;&lt;a class="btn" href="/contact"&gt;Contact&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/nav&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/header&gt;</span></p>
+<p class="p1"><span class="s1">&lt;main&gt;</span></p>
+<p class="p1"><span class="s1">&lt;section class="hero container"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="eyebrow"&gt;Case Study&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h1 class="h1"&gt;Polly + Rekognition Serverless Demos&lt;/h1&gt;</span></p>
+<p class="p1"><span class="s1">&lt;p class="sub"&gt;Public demos using API Gateway + Lambda, protected by Cognito Hosted UI and AWS WAF rate limiting. No data stored; SSM Parameter Store for secrets; cost‑controlled.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/section&gt;</span></p>
+<p class="p1"><span class="s1">&lt;section class="container layout"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;article class="content"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Context&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;p&gt;Goal: showcase AI/ML capabilities safely in public. Requirements: no PII retention, throttle abuse, quick rollback, and $&amp;lt;5/month at low traffic.&lt;/p&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Architecture&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;API Gateway (REST) → Lambda (Node/Python) → AWS SDK (Polly/Rekognition)&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Cognito Hosted UI for sign‑in; Amplify Auth for client demo; WAF per‑IP rate limits&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Assets in S3; CloudFront if needed; logs to CloudWatch&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;figure class="card" style="padding:0"&gt;&lt;img src="/assets/diagrams/polly-rekognition-demo.png" alt="Serverless architecture: API GW + Lambda with Cognito and WAF" style="max-width:100%;border-radius:14px"/&gt;&lt;figcaptionclass="kbd" style="padding:12px"&gt;Diagram placeholder.&lt;/figcaption&gt;&lt;/figure&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Decisions &amp; Trade‑offs&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;No persistent store:&lt;/strong&gt; avoids privacy risk; limits analytics depth.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;WAF vs custom throttling:&lt;/strong&gt; WAF is simpler and cheaper to operate.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;&lt;strong&gt;Hosted UI:&lt;/strong&gt; fast to stand up, less customizable than a bespoke front‑end.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Results&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="metrics"&gt;&lt;span class="metric"&gt;Cost ≈ $&amp;lt;5/mo&lt;/span&gt;&lt;span class="metric"&gt;P95 480ms → 95ms&lt;/span&gt;&lt;span class="metric"&gt;0 incidents&lt;/span&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Cost &amp; Ops&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Lambda + API GW free/low tier; WAF adds ~$5/mo baseline.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;SSM for secrets; rotations via script; alarms on 4XX/5XX surge.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;h2&gt;Improvements&lt;/h2&gt;</span></p>
+<p class="p1"><span class="s1">&lt;ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Add CloudFront for global demo latency.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Introduce per‑user quotas via Cognito groups.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;li&gt;Bundle a CDK app for single‑command deployment.&lt;/li&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/ul&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/article&gt;</span></p>
+<p class="p1"><span class="s1">&lt;aside class="rail"&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Stack&lt;/strong&gt;&lt;div class="stack" style="margin-top:8px"&gt;&lt;span class="tag"&gt;API GW&lt;/span&gt;&lt;span class="tag"&gt;Lambda&lt;/span&gt;&lt;span class="tag"&gt;Cognito&lt;/span&gt;&lt;span class="tag"&gt;WAF&lt;/span&gt;&lt;span class="tag"&gt;SSM&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Repo&lt;/strong&gt;&lt;br/&gt;&lt;a href="https://github.com/PeteDor" target="_blank"rel="noopener"&gt;github.com/PeteDor&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;div class="card"&gt;&lt;strong&gt;Demo&lt;/strong&gt;&lt;br/&gt;&lt;a href="#" target="_blank" rel="noopener"&gt;(optional) demo link&lt;/a&gt;&lt;/div&gt;</span></p>
+<p class="p1"><span class="s1">&lt;a class="btn primary" href="/contact"&gt;Talk to me about this pattern&lt;/a&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/aside&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/section&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/main&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
+<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+</body>
+</html>
