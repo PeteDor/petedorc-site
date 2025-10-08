@@ -1,5 +1,158 @@
 <!doctype html>
-<meta charset="utf-8">
-<title>S3 + CloudFront Edge Security</title>
-<h1>S3 + CloudFront Edge Security</h1>
-<p>Coming soon.</p>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S3 + CloudFront Portfolio with Edge Security — Case Study | petedorc.com</title>
+  <meta name="description" content="How I built a fast, resilient AWS static site on S3 + CloudFront with edge security headers, redirects, and optional signed URLs." />
+  <link rel="canonical" href="https://petedorc.com/case-studies/s3-cloudfront-edge-security/" />
+  <meta name="theme-color" content="#0B0D0F" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg:#0B0D0F; --surface:#111418; --text:#E6EAF2; --muted:#9AA7B2;
+      --a:#00B3A4; --b:#6CA0FF; --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+    a{color:var(--a);text-decoration:none}
+    .container{max-width:1120px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);
+      border-bottom:1px solid #1a1f26;z-index:20}
+    nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}
+    .wordmark{font-weight:700}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;
+      border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
+    .btn:hover{background:#151a21}
+    .btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}
+    .hero{padding:48px 0 16px}
+    .eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}
+    h1{font-size:32px;margin:8px 0}
+    .sub{color:var(--muted);max-width:75ch}
+    .layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}
+    .card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+    h2{font-size:22px;margin:0 0 8px}
+    .metrics,.stack{display:flex;gap:8px;flex-wrap:wrap}
+    .metric{display:inline-flex;align-items:center;gap:8px;background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
+    .tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
+    .rail{display:flex;flex-direction:column;gap:12px}
+    figure{margin:0}
+    figcaption{padding:12px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px}
+    img{max-width:100%;display:block;border-radius:14px}
+    @media (min-width: 960px){ .layout{grid-template-columns:minmax(0,1fr) 320px} }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"S3 + CloudFront Portfolio with Edge Security",
+    "author":{"@type":"Person","name":"Peterson Dorcelus"},
+    "about":"AWS static website hosting and edge security",
+    "mainEntityOfPage":"https://petedorc.com/case-studies/s3-cloudfront-edge-security/",
+    "datePublished":"2025-10-07",
+    "articleSection":["Architecture","Security"]
+  }
+  </script>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
+    <div class="navlinks">
+      <a class="btn" href="/#projects">Projects</a>
+      <a class="btn" href="/#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero container">
+    <div class="eyebrow">Case Study</div>
+    <h1>S3 + CloudFront Portfolio with Edge Security</h1>
+    <p class="sub">Static site on S3 with CloudFront, ACM, and Route 53. CloudFront Functions add redirects and security headers; optional Lambda@Edge provides signed URLs for private assets.</p>
+  </section>
+
+  <section class="container layout">
+    <article class="content">
+      <div class="card">
+        <h2>Context</h2>
+        <p>Deliver a fast, low-cost personal portfolio with global edge performance and strong baseline security, hosted entirely on AWS and deployed from GitHub.</p>
+      </div>
+
+    <div class="card">
+      <h2>Architecture</h2>
+      <p>Services: S3 (static hosting), CloudFront (edge CDN), ACM (TLS), Route 53 (DNS), CloudFront Functions (redirects & security headers), optional Lambda@Edge (signed URLs for private assets).</p>
+  <figure class="card" style="padding:0">
+    <img
+      src="/assets/diagrams/s3-cloudfront-edge-security.png"
+      alt="Architecture diagram: Route 53 ALIAS to CloudFront; viewer-request function for redirects and pretty URLs; response-headers policy for CSP/HSTS; private S3 origin via OAC"
+      loading="lazy" decoding="async"
+      style="display:block;width:100%;height:auto;aspect-ratio:2880/1620;border-radius:14px;background:#fff"
+    />
+  </figure>
+
+    </div>
+
+      <div class="card">
+        <h2>Decisions & Trade-offs</h2>
+        <ul>
+          <li><strong>CloudFront Functions vs Lambda@Edge:</strong> Functions are cheaper/faster for header logic; Lambda@Edge reserved for URL signing.</li>
+          <li><strong>Single-page then routes:</strong> Start with a single file for speed; graduate to Astro/MDX routes for scale/SEO.</li>
+          <li><strong>Strict CSP:</strong> Improves security; self-host fonts or allow Google Fonts domains explicitly.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Results</h2>
+        <div class="metrics">
+          <span class="metric">LCP ≤ 1.8s</span>
+          <span class="metric">INP ≤ 160ms</span>
+          <span class="metric">CLS ≤ 0.05</span>
+          <span class="metric">Cost &lt; $1/mo*</span>
+        </div>
+        <p style="color:#9AA7B2;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:8px">
+          * At portfolio traffic levels; CloudFront egress becomes the main cost at scale.
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Cost & Ops</h2>
+        <ul>
+          <li>S3 + CloudFront: pennies/month for low traffic.</li>
+          <li>GitHub Actions: build → sync to S3 → CloudFront invalidation on merge to <code>main</code>.</li>
+          <li>Observability: Plausible or CloudWatch RUM; errors in CloudFront/S3 logs.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Improvements</h2>
+        <ul>
+          <li>Self-host fonts and tighten CSP.</li>
+          <li>Promote to full <code>/projects</code> index with client-side search.</li>
+          <li>Signed URLs for any private demo assets.</li>
+        </ul>
+      </div>
+    </article>
+
+    <aside class="rail">
+      <div class="card">
+        <strong>Stack</strong>
+        <div class="stack" style="margin-top:8px">
+          <span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span>
+          <span class="tag">Route 53</span><span class="tag">ACM</span><span class="tag">CF Functions</span>
+        </div>
+      </div>
+      <div class="card"><strong>Repo</strong><br/>
+        <a href="https://github.com/PeteDor" target="_blank" rel="noopener">github.com/PeteDor</a></div>
+      <div class="card"><strong>Demo</strong><br/>
+        <a href="https://petedorc.com/" target="_blank" rel="noopener">petedorc.com</a></div>
+      <a class="btn primary" href="/#contact">Talk to me about this pattern</a>
+    </aside>
+  </section>
+</main>
+</body>
+</html>
