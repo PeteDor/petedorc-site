@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>CloudFront Security Headers — Pattern</title>
+<meta name="description" content="Add strict security headers at the edge via CloudFront Functions or a Response Headers Policy."/>
+<link rel="canonical" href="https://petedorc.com/docs/cloudfront-security-headers.html"/>
+<style>
+  body{margin:0;background:#0B0D0F;color:#E6EAF2;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  .container{max-width:960px;margin:0 auto;padding:32px}
+  a{color:#00B3A4;text-decoration:none}
+  pre{background:#0f1318;border:1px solid #1f2632;padding:16px;border-radius:12px;overflow:auto}
+  code,kbd{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  h1{margin:0 0 12px}
+  .muted{color:#9AA7B2}
+  .card{background:#111418;border:1px solid #1a1f26;border-radius:14px;padding:20px;margin:18px 0}
+  .back{display:inline-block;margin:6px 0 18px}
+  img{max-width:100%}
+</style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="/">← Back to home</a>
+    <h1>CloudFront Security Headers — Pattern</h1>
+    <p class="muted">Two options: <strong>(A)</strong> CloudFront <em>Response Headers Policy</em> (easiest) or <strong>(B)</strong> a <em>CloudFront Function</em> for full control.</p>
+
+    <div class="card">
+      <h2 id="policy">A) Response Headers Policy (recommended start)</h2>
+      <p>Create a policy once and attach it to your distribution’s <em>Behaviors</em>. Suggested values:</p>
+      <pre><code>Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+Content-Security-Policy: default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline';
+Referrer-Policy: strict-origin-when-cross-origin
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+</code></pre>
+      <p class="muted">Note: page uses inline CSS, so CSP includes <code>'unsafe-inline'</code> for <code>style-src</code>. If you move styles to a static CSS file later, you can tighten CSP.</p>
+    </div>
+
+    <div class="card">
+      <h2 id="function">B) CloudFront Function (fine-grained control)</h2>
+      <p>Attach as a <em>Viewer Response</em> function on the behavior serving HTML.</p>
+      <pre><code class="language-js">function handler(event) {
+  var resp = event.response;
+  var h = resp.headers;
+
+  h['strict-transport-security'] = {value: 'max-age=63072000; includeSubDomains; preload'};
+  h['content-security-policy']   = {value: "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'"};
+  h['referrer-policy']           = {value: 'strict-origin-when-cross-origin'};
+  h['x-content-type-options']    = {value: 'nosniff'};
+  h['x-frame-options']           = {value: 'DENY'};
+  h['permissions-policy']        = {value: 'geolocation=(), microphone=(), camera=()'};
+  h['cross-origin-opener-policy']= {value: 'same-origin'};
+  h['cross-origin-resource-policy']= {value: 'same-origin'};
+
+  return resp;
+}
+</code></pre>
+      <p>For non-HTML (PNG/CSS/JS), you can optionally attach the same function or let the Response Headers Policy apply globally.</p>
+    </div>
+
+    <div class="card">
+      <h2 id="cf-invalidate">Deploy notes</h2>
+      <ul>
+        <li>After changes, run your GitHub workflow and invalidate <code>/index.html</code> and <code>/docs/*</code>.</li>
+        <li>Test in dev tools → <em>Network</em> → select a document → <em>Response Headers</em>.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
