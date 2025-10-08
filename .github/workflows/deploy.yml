@@ -45,9 +45,9 @@ jobs:
             --cache-control "max-age=31536000,public,immutable" \
             --delete
 
-      # Invalidate only what can change or is HTML-driven
+      # Invalidate paths that can change or are referenced by HTML
       - name: Invalidate CloudFront
         run: |
           aws cloudfront create-invalidation \
             --distribution-id "$CF_DIST_ID" \
-            --paths "/index.html" "/case-studies/*" "/assets/*"
+            --paths "/index.html" "/case-studies/*" "/assets/*" "/docs/*"
