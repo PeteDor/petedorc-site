@@ -97,6 +97,9 @@
       #resume{border:0;padding:0}
       body{background:#fff;color:#000}
     }
+    /* Reusable image style for cards */
+    .card-img{
+      background:#fff;border:1px solid #1e2734;border-radius:12px;width:100%;height:auto;display:block;margin:8px 0 10px;}
     /* Tooltip */
     .tip{position:relative; border-bottom:1px dotted var(--muted); cursor:help;}
     .tip:focus{outline:2px solid var(--b); outline-offset:2px;}
@@ -184,14 +187,20 @@
           <option value="recent">Most recent</option>
         </select>
       </div>
-
       <div class="grid projects" id="project-list" role="list">
         <!-- Project Card 1 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Serverless" data-impact="100" data-date="2025-09-01">
-          <h3><a href="/case-studies/s3-cloudfront-edge-security">S3 + CloudFront Portfolio with Edge Security</a></h3>
+          <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>   
+        <picture>
+          <source srcset="/assets/diagrams/s3-cloudfront-edge-security.avif" type="image/avif">
+          <source srcset="/assets/diagrams/s3-cloudfront-edge-security.webp" type="image/webp">
           <img src="/assets/diagrams/s3-cloudfront-edge-security.png"
                 alt="S3 + CloudFront Edge Security diagram"
-                style="width:100%;height:auto;border-radius:12px;margin:8px 0 10px;border:1px solid #1e2734;background:#fff">
+                class="card-img"
+                width="1280" height="720"
+                loading="lazy" decoding="async"
+              />
+        </picture>
           <p class="meta">Static site on S3, CloudFront, ACM, Route 53. CloudFront Functions for redirects & headers; optional Lambda@Edge for signed URLs.</p>
           <div class="metrics">
             <span class="metric">LCP ≤ 1.8s</span>
