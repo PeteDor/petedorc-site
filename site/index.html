@@ -279,24 +279,27 @@
     <!-- Contact -->
     <section id="contact" class="container" aria-labelledby="contact-h">
       <h2 id="contact-h">Contact</h2>
-      <form id="contact-form" aria-describedby="contact-status">
-        <label>Full name
-          <input name="name" autocomplete="name" required />
-        </label>
-        <label>Email
-          <input name="email" type="email" autocomplete="email" required />
-        </label>
-        <label>Message
-          <textarea name="message" required></textarea>
-        </label>
-        <input type="text" name="company" aria-hidden="true" tabindex="-1" style="position:absolute;left:-9999px" autocomplete="off" />
-        <button class="btn primary" type="submit">Send</button>
-        <div id="contact-status" class="status" role="status" aria-live="polite"></div>
-        <p class="status">Or email <a href="mailto:PDorcelus@gmail.com">PDorcelus@gmail.com</a>.</p>
-      </form>
+        <form id="contact-form">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+
+          <!-- Honeypot (spam trap) -->
+          <input type="text" name="company" tabindex="-1" autocomplete="off"
+                  style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+
+          <!-- keep your existing form markup -->
+          <button type="submit" id="send-btn">Send</button>
+        </form>
+
+   <p id="contact-status" class="status" role="status" aria-live="polite"></p>
     </section>
   </main>
-
   <footer>
     <div class="container">
       <div class="right-rail">
@@ -307,54 +310,104 @@
       <!-- In CloudFront, add security headers via Function/Lambda@Edge. See docs/cf-headers. -->
     </div>
   </footer>
+     <script>
+       // ── Project search / filter / sort ───────────────────────────────────────────
+       const $  = (s, d=document)=>d.querySelector(s);
+       const $$ = (s, d=document)=>Array.from(d.querySelectorAll(s));
+       const list = $('#project-list'); const items = $$('#project-list>.card');
+       const q  = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
 
-  <script>
-    // Lightweight project search/filter/sort (no deps)
-    const $ = (s, d=document)=>d.querySelector(s); const $$=(s,d=document)=>Array.from(d.querySelectorAll(s));
-    const list = $('#project-list'); const items = $$('#project-list>.card');
-    const q = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
-    function apply(){
-      const term = (q.value||'').toLowerCase();
-      const cloud = (fc.value||'').toLowerCase();
-      const domain = (fd.value||'').toLowerCase();
-      let filtered = items.filter(it=>{
-        const text = it.textContent.toLowerCase();
-        const okQ = !term || text.includes(term);
-        const okC = !cloud || (it.dataset.cloud||'').toLowerCase().includes(cloud);
-        const okD = !domain || (it.dataset.domain||'').toLowerCase().includes(domain);
-        it.style.display = (okQ && okC && okD) ? '' : 'none';
-        return okQ && okC && okD;
-      });
-      filtered.sort((a,b)=>{
-        if(sort.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
-        return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
-      }).forEach(n=>list.appendChild(n));
-    }
-    [q, fc, fd, sort].forEach(el=>el.addEventListener('input', apply));
-    window.addEventListener('keydown', (e)=>{ if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA'){ e.preventDefault(); q.focus(); }});
-    apply();
+       function apply(){
+         const term = (q?.value||'').toLowerCase();
+         const cloud = (fc?.value||'').toLowerCase();
+         const domain = (fd?.value||'').toLowerCase();
+         let filtered = items.filter(it=>{
+           const text = it.textContent.toLowerCase();
+           const okQ = !term || text.includes(term);
+           const okC = !cloud || (it.dataset.cloud||'').toLowerCase().includes(cloud);
+           const okD = !domain || (it.dataset.domain||'').toLowerCase().includes(domain);
+           it.style.display = (okQ && okC && okD) ? '' : 'none';
+           return okQ && okC && okD;
+         });
+         filtered.sort((a,b)=>{
+           if (sort?.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
+           return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
+         }).forEach(n=>list.appendChild(n));
+       }
+       [q, fc, fd, sort].forEach(el=>el && el.addEventListener('input', apply));
+       window.addEventListener('keydown', (e)=>{
+         const tag = document.activeElement?.tagName;
+         if(e.key==='/' && tag!=='INPUT' && tag!=='TEXTAREA'){ e.preventDefault(); q?.focus(); }
+       });
+       apply();
 
-    // Contact form — replace apiUrl with your API Gateway invoke URL
-    const apiUrl = '';
-    const form = $('#contact-form'); const statusEl = $('#contact-status');
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      statusEl.textContent = 'Sending…';
-      const data = Object.fromEntries(new FormData(form));
-      if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); return; } // honeypot
-      try{
-        if(!apiUrl){
-          statusEl.innerHTML = 'Form backend not configured. Email <a href="mailto:PDorcelus@gmail.com">PDorcelus@gmail.com</a>.';
-          return;
-        }
-        const r = await fetch(apiUrl, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-        if(r.ok){ statusEl.textContent = 'Thanks! I will reply shortly.'; form.reset(); }
-        else{ statusEl.textContent = 'Could not send right now. Please email me.'; }
-      }catch(err){ statusEl.textContent = 'Network error. Please email me.'; }
-    });
+       // ── Contact form submit → API Gateway ────────────────────────────────────────
+       // API Gateway endpoint
+       const apiUrl = 'https://0ji1veimu2.execute-api.us-east-1.amazonaws.com/contact';
 
-    // Year
-    $('#y').textContent = new Date().getFullYear();
-  </script>
+       // Elements
+       const form = document.getElementById('contact-form');
+       const statusEl = document.getElementById('contact-status');
+       const btn = document.getElementById('send-btn');// your <button type="submit" id="send-btn">
+
+       form?.addEventListener('submit', async (e)=>{
+         e.preventDefault();
+         statusEl.textContent = 'Sending…';
+         btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
+         form.setAttribute('aria-busy','true');
+
+         const data = Object.fromEntries(new FormData(form));
+
+         // Honeypot (spam trap)
+         if (data.company) {
+           statusEl.textContent = 'Thanks!';
+           form.reset();
+           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
+           form.removeAttribute('aria-busy');
+           return;
+         }
+
+         // 🔒 Client-side guards (match Lambda)
+         if ((data.message || '').length > 5000) {
+           statusEl.textContent = 'Message is too long (max 5000 characters).';
+           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
+           form.removeAttribute('aria-busy');
+           return;
+         }
+         const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'');
+         if (!emailOk) {
+           statusEl.textContent = 'Please enter a valid email.';
+           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
+           form.removeAttribute('aria-busy');
+           return;
+         }
+
+         try {
+           const r = await fetch(apiUrl, {
+             method: 'POST',
+             headers: {'Content-Type':'application/json'},
+             body: JSON.stringify({ name: data.name, email: data.email, message: data.message, company: data.company })
+           });
+
+           if (r.ok) {
+             statusEl.textContent = 'Thanks! I will reply shortly.';
+             form.reset();
+           } else {
+             let msg = 'Could not send right now.';
+             try { const j = await r.json(); if (j?.error) msg = 'Error: ' + j.error; } catch {}
+             statusEl.textContent = msg + ' Please email me.';
+           }
+         } catch {
+           statusEl.textContent = 'Network error. Please email me.';
+         } finally {
+          btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
+           form.removeAttribute('aria-busy');
+         }
+       });
+
+       // ── Footer year ─────────────────────────────────────────────────────────────
+       const y = $('#y'); if (y) y.textContent = new Date().getFullYear();
+     </script>
+
 </body>
 </html>
