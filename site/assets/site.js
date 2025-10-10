@@ -1,95 +1,99 @@
-       // /assets/site.js
-       console.log('[site] loaded');
+// /assets/site.js
+console.log('[site] loaded');
 
-       // ---------------- Project search / filter / sort ----------------
-       const $  = (s,d=document)=>d.querySelector(s);
-       const $$ = (s,d=document)=>Array.from(d.querySelectorAll(s));
-       const list = $('#project-list'); const items = $$('#project-list>.card');
-       const q = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
+// ---------------- Contact form submit → API Gateway (run FIRST) ----------------
+const apiUrl   = 'https://0ji1veimu2.execute-api.us-east-1.amazonaws.com/contact';
+const form     = document.getElementById('contact-form');
+const statusEl = document.getElementById('contact-status');
+const btn      = document.getElementById('send-btn');
 
-       function apply(){
-         const term = (q?.value||'').toLowerCase();
-         const cloud = (fc?.value||'').toLowerCase();
-         const domain = (fd?.value||'').toLowerCase();
-         let filtered = items.filter(it=>{
-           const text = it.textContent.toLowerCase();
-           const okQ = !term || text.includes(term);
-           const okC = !cloud || (it.dataset.cloud||'').toLowerCase().includes(cloud);
-           const okD = !domain || (it.dataset.domain||'').toLowerCase().includes(domain);
-           it.style.display = (okQ && okC && okD) ? '' : 'none';
-           return okQ && okC && okD;
-         });
-         filtered.sort((a,b)=>{
-           if (sort?.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
-           return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
-         }).forEach(n=>list?.appendChild(n));
-       }
+if (form) {
+  console.log('[site] contact form handler attached');
 
-       [q, fc, fd, sort].forEach(el => el && el.addEventListener('input', apply));
-        // or: [q, fc, fd, sort].filter(Boolean).forEach(el => el.addEventListener('input', apply));
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
+    statusEl.textContent = 'Sending…';
+    btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
+    form.setAttribute('aria-busy','true');
 
-       window.addEventListener('keydown', (e)=>{
-         const tag = document.activeElement?.tagName;
-         if(e.key==='/' && tag!=='INPUT' && tag!=='TEXTAREA'){ e.preventDefault(); q?.focus(); }
-       });
-       apply();
+    const data = Object.fromEntries(new FormData(form));
 
-       // ---------------- Contact form submit → API Gateway ----------------
-       const apiUrl = 'https://0ji1veimu2.execute-api.us-east-1.amazonaws.com/contact';
+    // Honeypot
+    if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); cleanup(); return; }
 
-       const form     = document.getElementById('contact-form');
-       const statusEl = document.getElementById('contact-status');
-       const btn      = document.getElementById('send-btn');
+    // Client guards (mirror Lambda)
+    if (!data.message || data.message.length > 5000) { statusEl.textContent = 'Message is too long (max 5000).'; cleanup(); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'')) { statusEl.textContent = 'Please enter a valid email.'; cleanup(); return; }
 
-       if (form) {
-         console.log('[site] contact form handler attached');
+    try {
+      const r = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json' },
+        body: JSON.stringify({ name: data.name, email: data.email, message: data.message, company: data.company })
+      });
+      if (r.ok) { statusEl.textContent = 'Thanks! I will reply shortly.'; form.reset(); }
+      else {
+        let msg = 'Could not send right now.';
+        try { const j = await r.json(); if (j?.error) msg = 'Error: ' + j.error; } catch {}
+        statusEl.textContent = msg + ' Please email me.';
+      }
+    } catch (err) {
+      console.error(err);
+      statusEl.textContent = 'Network error. Please email me.';
+    } finally {
+      cleanup();
+    }
+  });
+} else {
+  console.warn('[site] contact form NOT found');
+}
 
-         form.addEventListener('submit', async (e)=>{
-           e.preventDefault();
+function cleanup(){
+  btn && (btn.disabled = false, btn.setAttribute('aria-disabled','false'));
+  form?.removeAttribute('aria-busy');
+}
 
-           statusEl.textContent = 'Sending…';
-           btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
-           form.setAttribute('aria-busy','true');
+// ---------------- Project search / filter / sort (guarded) ----------------
+const $  = (s,d=document)=>d.querySelector(s);
+const $$ = (s,d=document)=>Array.from(d.querySelectorAll(s));
 
-           const data = Object.fromEntries(new FormData(form));
+const list = $('#project-list');
+const items = $$('#project-list>.card');
+const q  = $('#q');
+const fc = $('#filter-cloud');
+const fd = $('#filter-domain');
+const sort = $('#sort');
 
-           // Honeypot
-           if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); cleanup(); return; }
+function apply(){
+  const term   = (q?.value  ||'').toLowerCase();
+  const cloud  = (fc?.value ||'').toLowerCase();
+  const domain = (fd?.value ||'').toLowerCase();
 
-           // Client-side guards (match Lambda)
-           if (!data.message || data.message.length > 5000) { statusEl.textContent = 'Message is too long (max 5000).'; cleanup(); return; }
-           const emailOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'');
-           if (!emailOK) { statusEl.textContent = 'Please enter a valid email.'; cleanup(); return; }
+  let filtered = items.map(it => {
+    const text = it.textContent.toLowerCase();
+    const okQ = !term   || text.includes(term);
+    const okC = !cloud  || (it.dataset.cloud  ||'').toLowerCase().includes(cloud);
+    const okD = !domain || (it.dataset.domain ||'').toLowerCase().includes(domain);
+    it.style.display = (okQ && okC && okD) ? '' : 'none';
+    return { it, ok: okQ && okC && okD };
+  }).filter(x => x.ok).map(x => x.it);
 
-           try {
-             const r = await fetch(apiUrl, {
-               method: 'POST',
-               headers: {'Content-Type':'application/json'},
-               body: JSON.stringify({ name: data.name, email: data.email, message: data.message, company: data.company })
-             });
-             if (r.ok) { statusEl.textContent = 'Thanks! I will reply shortly.'; form.reset(); }
-             else {
-               let msg = 'Could not send right now.';
-               try { const j = await r.json(); if (j?.error) msg = 'Error: ' + j.error; } catch {}
-               statusEl.textContent = msg + ' Please email me.';
-             }
-           } catch (err) {
-             console.error(err);
-             statusEl.textContent = 'Network error. Please email me.';
-           } finally {
-             cleanup();
-           }
-         });
+  filtered.sort((a,b)=>{
+    if (sort?.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
+    return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
+  }).forEach(n => list?.appendChild(n));
+}
 
-       } else {
-         console.warn('[site] contact form NOT found');
-       }
+// GUARD the listeners (this line previously crashed on nulls)
+[q, fc, fd, sort].forEach(el => el && el.addEventListener('input', apply));
 
-       function cleanup(){
-         btn && (btn.disabled = false, btn.setAttribute('aria-disabled','false'));
-         form?.removeAttribute('aria-busy');
-       }
+window.addEventListener('keydown', (e)=>{
+  const tag = document.activeElement?.tagName;
+  if (e.key==='/' && tag!=='INPUT' && tag!=='TEXTAREA') { e.preventDefault(); q?.focus(); }
+});
 
-       // Footer year
-       const y = $('#y'); if (y) y.textContent = new Date().getFullYear();
+apply();
+
+// ---------------- Footer year ----------------
+const y = $('#y'); if (y) y.textContent = new Date().getFullYear();
