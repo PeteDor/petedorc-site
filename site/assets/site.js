@@ -25,7 +25,10 @@
          }).forEach(n=>list?.appendChild(n));
        }
 
-       [q, fc, fd, sort].forEach(el=>el?.addEventListener('input', apply));
+       [q, fc, fd, sort].forEach(el => el && el.addEventListener('input', apply));
+        // or: [q, fc, fd, sort].filter(Boolean).forEach(el => el.addEventListener('input', apply));
+
+
        window.addEventListener('keydown', (e)=>{
          const tag = document.activeElement?.tagName;
          if(e.key==='/' && tag!=='INPUT' && tag!=='TEXTAREA'){ e.preventDefault(); q?.focus(); }
