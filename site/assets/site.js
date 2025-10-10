@@ -1,9 +1,11 @@
-<script>
-       // ── Project search / filter / sort ───────────────────────────────────────────
-       const $  = (s, d=document)=>d.querySelector(s);
-       const $$ = (s, d=document)=>Array.from(d.querySelectorAll(s));
+       // /assets/site.js
+       console.log('[site] loaded');
+
+       // ---------------- Project search / filter / sort ----------------
+       const $  = (s,d=document)=>d.querySelector(s);
+       const $$ = (s,d=document)=>Array.from(d.querySelectorAll(s));
        const list = $('#project-list'); const items = $$('#project-list>.card');
-       const q  = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
+       const q = $('#q'); const fc = $('#filter-cloud'); const fd = $('#filter-domain'); const sort = $('#sort');
 
        function apply(){
          const term = (q?.value||'').toLowerCase();
@@ -20,79 +22,71 @@
          filtered.sort((a,b)=>{
            if (sort?.value==='recent') return (b.dataset.date||'').localeCompare(a.dataset.date||'');
            return (parseInt(b.dataset.impact||0)) - (parseInt(a.dataset.impact||0));
-         }).forEach(n=>list.appendChild(n));
+         }).forEach(n=>list?.appendChild(n));
        }
-       [q, fc, fd, sort].forEach(el=>el && el.addEventListener('input', apply));
+
+       [q, fc, fd, sort].forEach(el=>el?.addEventListener('input', apply));
        window.addEventListener('keydown', (e)=>{
          const tag = document.activeElement?.tagName;
          if(e.key==='/' && tag!=='INPUT' && tag!=='TEXTAREA'){ e.preventDefault(); q?.focus(); }
        });
        apply();
 
-       // ── Contact form submit → API Gateway ────────────────────────────────────────
-       // API Gateway endpoint
+       // ---------------- Contact form submit → API Gateway ----------------
        const apiUrl = 'https://0ji1veimu2.execute-api.us-east-1.amazonaws.com/contact';
 
-       // Elements
-       const form = document.getElementById('contact-form');
+       const form     = document.getElementById('contact-form');
        const statusEl = document.getElementById('contact-status');
-       const btn = document.getElementById('send-btn');// your <button type="submit" id="send-btn">
+       const btn      = document.getElementById('send-btn');
 
-       form?.addEventListener('submit', async (e)=>{
-         e.preventDefault();
-         statusEl.textContent = 'Sending…';
-         btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
-         form.setAttribute('aria-busy','true');
+       if (form) {
+         console.log('[site] contact form handler attached');
 
-         const data = Object.fromEntries(new FormData(form));
+         form.addEventListener('submit', async (e)=>{
+           e.preventDefault();
 
-         // Honeypot (spam trap)
-         if (data.company) {
-           statusEl.textContent = 'Thanks!';
-           form.reset();
-           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
-           form.removeAttribute('aria-busy');
-           return;
-         }
+           statusEl.textContent = 'Sending…';
+           btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
+           form.setAttribute('aria-busy','true');
 
-         // 🔒 Client-side guards (match Lambda)
-         if ((data.message || '').length > 5000) {
-           statusEl.textContent = 'Message is too long (max 5000 characters).';
-           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
-           form.removeAttribute('aria-busy');
-           return;
-         }
-         const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'');
-         if (!emailOk) {
-           statusEl.textContent = 'Please enter a valid email.';
-           btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
-           form.removeAttribute('aria-busy');
-           return;
-         }
+           const data = Object.fromEntries(new FormData(form));
 
-         try {
-           const r = await fetch(apiUrl, {
-             method: 'POST',
-             headers: {'Content-Type':'application/json'},
-             body: JSON.stringify({ name: data.name, email: data.email, message: data.message, company: data.company })
-           });
+           // Honeypot
+           if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); cleanup(); return; }
 
-           if (r.ok) {
-             statusEl.textContent = 'Thanks! I will reply shortly.';
-             form.reset();
-           } else {
-             let msg = 'Could not send right now.';
-             try { const j = await r.json(); if (j?.error) msg = 'Error: ' + j.error; } catch {}
-             statusEl.textContent = msg + ' Please email me.';
+           // Client-side guards (match Lambda)
+           if (!data.message || data.message.length > 5000) { statusEl.textContent = 'Message is too long (max 5000).'; cleanup(); return; }
+           const emailOK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'');
+           if (!emailOK) { statusEl.textContent = 'Please enter a valid email.'; cleanup(); return; }
+
+           try {
+             const r = await fetch(apiUrl, {
+               method: 'POST',
+               headers: {'Content-Type':'application/json'},
+               body: JSON.stringify({ name: data.name, email: data.email, message: data.message, company: data.company })
+             });
+             if (r.ok) { statusEl.textContent = 'Thanks! I will reply shortly.'; form.reset(); }
+             else {
+               let msg = 'Could not send right now.';
+               try { const j = await r.json(); if (j?.error) msg = 'Error: ' + j.error; } catch {}
+               statusEl.textContent = msg + ' Please email me.';
+             }
+           } catch (err) {
+             console.error(err);
+             statusEl.textContent = 'Network error. Please email me.';
+           } finally {
+             cleanup();
            }
-         } catch {
-           statusEl.textContent = 'Network error. Please email me.';
-         } finally {
-          btn && (btn.disabled = false, btn.removeAttribute('aria-disabled'));
-           form.removeAttribute('aria-busy');
-         }
-       });
+         });
 
-       // ── Footer year ─────────────────────────────────────────────────────────────
+       } else {
+         console.warn('[site] contact form NOT found');
+       }
+
+       function cleanup(){
+         btn && (btn.disabled = false, btn.setAttribute('aria-disabled','false'));
+         form?.removeAttribute('aria-busy');
+       }
+
+       // Footer year
        const y = $('#y'); if (y) y.textContent = new Date().getFullYear();
-     </script>
