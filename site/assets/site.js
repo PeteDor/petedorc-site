@@ -2,7 +2,7 @@
 console.log('[site] loaded');
 
 // ---------------- Contact form submit → API Gateway (run FIRST) ----------------
-const apiUrl   = 'https://0jiv1eimu2.execute-api.us-east-1.amazonaws.com/contact';
+const apiUrl = 'https://0jiv1eimu2.execute-api.us-east-1.amazonaws.com/contact';
 const form     = document.getElementById('contact-form');
 const statusEl = document.getElementById('contact-status');
 const btn      = document.getElementById('send-btn');
