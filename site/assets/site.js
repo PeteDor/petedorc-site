@@ -2,27 +2,22 @@
 console.log('[site] loaded');
 
 // ---------------- Contact form submit → API Gateway (run FIRST) ----------------
-const apiUrl   = 'https://0ji1veimu2.execute-api.us-east-1.amazonaws.com/contact';
+const apiUrl   = 'https://0jiv1eimu2.execute-api.us-east-1.amazonaws.com/contact';
 const form     = document.getElementById('contact-form');
 const statusEl = document.getElementById('contact-status');
 const btn      = document.getElementById('send-btn');
 
 if (form) {
   console.log('[site] contact form handler attached');
-
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     statusEl.textContent = 'Sending…';
     btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
     form.setAttribute('aria-busy','true');
 
     const data = Object.fromEntries(new FormData(form));
-
-    // Honeypot
     if (data.company) { statusEl.textContent = 'Thanks!'; form.reset(); cleanup(); return; }
 
-    // Client guards (mirror Lambda)
     if (!data.message || data.message.length > 5000) { statusEl.textContent = 'Message is too long (max 5000).'; cleanup(); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email||'')) { statusEl.textContent = 'Please enter a valid email.'; cleanup(); return; }
 
@@ -85,7 +80,7 @@ function apply(){
   }).forEach(n => list?.appendChild(n));
 }
 
-// GUARD the listeners (this line previously crashed on nulls)
+// This was the crash point before — keep the guard
 [q, fc, fd, sort].forEach(el => el && el.addEventListener('input', apply));
 
 window.addEventListener('keydown', (e)=>{
