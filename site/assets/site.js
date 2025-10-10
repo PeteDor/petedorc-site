@@ -11,7 +11,7 @@ if (form) {
   console.log('[site] contact form handler attached');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    statusEl.textContent = 'Sending…';
+    statusEl.textContent = 'Sending...';
     btn && (btn.disabled = true, btn.setAttribute('aria-disabled','true'));
     form.setAttribute('aria-busy','true');
 
