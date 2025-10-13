@@ -3,167 +3,345 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES | petedorc.com</title>
-  <meta name="description" content="Production-grade contact form for petedorc.com using API Gateway (HTTP API), Lambda (Node.js 20), DynamoDB TTL rate limiting, and Amazon SES. Includes architecture, trade-offs, KPIs, and ops." />
-  <link rel="canonical" href="https://petedorc.com/case-studies/serverless-contact-form-aws/" />
-
+  <title>Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)</title>
+  <meta name="description" content="Designing resilient, cost‑efficient cloud systems on AWS. Multi‑cloud fluent—networking, serverless, and AI workloads—with measurable results." />
+  <link rel="canonical" href="https://petedorc.com/" />
   <meta name="theme-color" content="#0B0D0F" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)" />
+  <meta property="og:description" content="Designing resilient, cost‑efficient cloud systems on AWS with measurable results." />
+  <meta property="og:url" content="https://petedorc.com/" />
+  <meta property="og:image" content="/og/petedorc-og.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Peterson “Pete” Dorcelus — Senior Cloud Architect (AWS‑first)" />
+  <meta name="twitter:description" content="Designing resilient, cost‑efficient cloud systems on AWS with measurable results." />
+  <meta name="twitter:image" content="/og/petedorc-og.jpg" />
+  <!-- Fonts (subset + swap in production) -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-
+  <!-- Primary icons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+<link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="manifest" href="/site.webmanifest" />
+  <!-- Minimal CSS -->
   <style>
     :root{
       --bg:#0B0D0F; --surface:#111418; --text:#E6EAF2; --muted:#9AA7B2;
-      --a:#00B3A4; --b:#6CA0FF; --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --a:#00B3A4; --b:#6CA0FF; --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+      --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
+      --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-6:24px; --space-8:32px; --space-12:48px; --space-16:64px;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5}
     a{color:var(--a);text-decoration:none}
-    .container{max-width:1120px;margin:0 auto;padding:0 16px}
+    img{max-width:100%}
+    a:focus,button:focus,input:focus,select:focus,textarea:focus{outline:2px solid var(--b);outline-offset:2px}
+    .container{max-width:1120px;margin:0 auto;padding:0 var(--space-4)}
     header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}
-    nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}
-    .wordmark{font-weight:700}
-    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:var(--space-3) 0}
+    .brand{display:flex;gap:var(--space-3);align-items:center}
+    .brand .wordmark{font-weight:700;letter-spacing:.2px}
+    .wordmark small{color:var(--muted);font-weight:500;margin-left:6px}
+    .navlinks{display:flex;gap:var(--space-4)}
+    .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
     .btn:hover{background:#151a21}
     .btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}
-    .hero{padding:48px 0 16px}
+    .skip{position:absolute;left:-9999px}
+    .skip:focus{left:var(--space-4);top:var(--space-4);background:#000;padding:8px 12px;border-radius:8px}
+    /* Hero */
+    .hero{padding:var(--space-16) 0 var(--space-12)}
     .eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}
-    h1{font-size:32px;margin:8px 0}
-    .sub{color:var(--muted);max-width:75ch}
-    .layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}
-    .card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}
-    h2{font-size:22px;margin:0 0 8px}
-    .metrics,.stack{display:flex;gap:8px;flex-wrap:wrap}
-    .metric{display:inline-flex;align-items:center;gap:8px;background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
-    .tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
-    .rail{display:flex;flex-direction:column;gap:12px}
-    figure{margin:0}
-    figcaption{padding:12px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px}
-    img{max-width:100%;display:block;border-radius:14px}
-    @media (min-width:960px){ .layout{grid-template-columns:minmax(0,1fr) 320px} }
-    code.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}
+    h1{font-size:32px;margin:12px 0 8px}
+    .sub{font-size:18px;color:var(--muted);max-width:62ch}
+    .cta-row{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-top:var(--space-6)}
+    .proof{display:flex;gap:var(--space-6);flex-wrap:wrap;margin-top:var(--space-6);align-items:center}
+    .chip{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:var(--muted);font-size:14px}
+    .chip .dot{width:8px;height:8px;border-radius:50%;background:var(--a)}
+    /* Sections */
+    section{padding:var(--space-16) 0;border-top:1px solid #141a22}
+    section h2{font-size:24px;margin:0 0 var(--space-6)}
+    .grid{display:grid;gap:var(--space-6)}
+    .grid.projects{grid-template-columns:repeat(12,1fr)}
+    .card{grid-column:span 12;background:var(--surface);border:1px solid #1a1f26;border-radius:var(--radius);padding:var(--space-6);box-shadow:var(--shadow)}
+    .card:hover{border-color:#273040}
+    .card h3{margin:0 0 8px;font-size:20px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+    .metrics{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .metric{background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:4px 10px;font-size:13px}
+    .stack{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+    .tag{border:1px solid #263040;border-radius:999px;padding:2px 8px;color:#c7d2e0;font-size:12px}
+    .right-rail{display:flex;gap:var(--space-6);flex-wrap:wrap}
+    /* Search + Filters */
+    .filters{display:flex;gap:var(--space-4);flex-wrap:wrap;margin-bottom:var(--space-6)}
+    .input{background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:10px 12px;color:var(--text)}
+    .select{appearance:none;background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:10px 12px;color:var(--text)}
+    /* Resume */
+    .resume{background:linear-gradient(180deg,#0b0d0f,#0e1116)}
+    .resume .dl{display:flex;gap:var(--space-4);align-items:center}
+    /* Contact */
+    form{display:grid;gap:12px;max-width:640px}
+    label{display:grid;gap:6px}
+    input,textarea{background:#0f1318;border:1px solid #1f2632;border-radius:10px;padding:12px;color:var(--text)}
+    textarea{min-height:140px}
+    .status{margin-top:8px;font-size:14px;color:var(--muted)}
+    footer{padding:var(--space-12) 0;color:var(--muted)}
+    /* Responsive */
+    @media(min-width:720px){
+      h1{font-size:40px}
+      .card{grid-column:span 6}
+    }
+    @media(min-width:1040px){
+      .card{grid-column:span 4}
+    }
+    /* Print tweaks for resume page section */
+    @media print {
+      header, .hero, #projects, #docs, #contact, footer{display:none}
+      #resume{border:0;padding:0}
+      body{background:#fff;color:#000}
+    }
+    /* Reusable image style for cards */
+    .card-img{
+      background:#fff;
+      border:1px solid #1e2734;
+      border-radius:12px;
+      width:100%;
+      height:auto;
+      display:block;
+      margin:8px 0 10px;
+      aspect-ratio:16/9;          /* keeps the shape before the image paints */
+    }
+    .card .card-img{ max-height:none; } /* neutralize any generic card image caps */
+    /* Tooltip */
+    .tip{position:relative; border-bottom:1px dotted var(--muted); cursor:help;}
+    .tip:focus{outline:2px solid var(--b); outline-offset:2px;}
+    .tip::after{content:attr(data-tip); position:absolute; left:0; top:120%; transform:translateY(8px); background:#0f1318; color:var(--text); border:1px solid #1f2632; border-radius:10px; padding:10px 12px; width:min(560px, 90vw); box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .15s ease, transform .15s ease; z-index:30; line-height:1.35; font-size:14px;}
+    .tip::before{content:''; position:absolute; left:10px; top:120%; transform:translateY(0); border:6px solid transparent; border-bottom-color:#1f2632; opacity:0; transition:opacity .15s ease;}
+    .tip:hover::after,.tip:focus::after{opacity:1; transform:translateY(0);}
+    .tip:hover::before,.tip:focus::before{opacity:1;}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
-
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Article",
-    "headline":"Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
-    "author":{"@type":"Person","name":"Peterson Dorcelus"},
-    "about":["API Gateway","Lambda","DynamoDB","SES"],
-    "mainEntityOfPage":"https://petedorc.com/case-studies/serverless-contact-form-aws/",
-    "datePublished":"2025-10-12",
-    "articleSection":["Serverless","Email","Security"]
-  }
-  </script>
+  <!-- JSON-LD: Person + Website -->
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Person","name":"Peterson “Pete” Dorcelus","alternateName":"Pete Dorcelus","jobTitle":"Cloud Architect","url":"https://petedorc.com","email":"mailto:PDorcelus@gmail.com","sameAs":["https://github.com/PeteDor","https://www.linkedin.com/in/petersondorcelus/"]}</script>
 </head>
 <body>
-<header>
-  <nav>
-    <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
-    <div class="navlinks">
-      <a class="btn" href="/#projects">Projects</a>
-      <a class="btn" href="/#contact">Contact</a>
+  <a class="skip" href="#main">Skip to content</a>
+  <header>
+    <div class="container">
+      <nav aria-label="Primary">
+        <div class="brand">
+          <div class="wordmark">petedorc<span style="color:var(--a)">.com</span> <small>Cloud Architect</small></div>
+        </div>
+        <div class="navlinks" role="menubar">
+          <a role="menuitem" href="#projects">Projects</a>
+          <a role="menuitem" href="#resume">Resume</a>
+          <a role="menuitem" href="#docs">Docs</a>
+          <a role="menuitem" href="#search" title="Press / to search">Search</a>
+          <a role="menuitem" href="#contact" class="btn">Contact</a>
+        </div>
+      </nav>
     </div>
-  </nav>
-</header>
+  </header>
 
-<main>
-  <section class="hero container">
-    <div class="eyebrow">Case Study</div>
-    <h1>Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</h1>
-    <p class="sub">Production-grade contact channel for petedorc.com using API Gateway (HTTP API) → Lambda (Node.js 20) with input validation and per-IP rate limiting in DynamoDB (TTL), sending mail via Amazon SES. Fronted by CloudFront and S3.</p>
-  </section>
-
-  <section class="container layout">
-    <article class="content">
-      <div class="card">
-        <h2>Context</h2>
-        <p>Goal: Own the pipeline and keep ops near-zero. Requirements: fast UX, high deliverability, abuse protection, and no third‑party form service. Constraints: keep bundle small and preserve Web Vitals (LCP ≤ 2.0s, INP ≤ 200ms).</p>
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero container" aria-label="Intro">
+      <div class="eyebrow">Available for Staff/Senior Cloud Architect roles</div>
+      <h1>Designing resilient, cost‑efficient cloud systems on AWS.</h1>
+      <p class="sub">Multi‑cloud fluent—networking, serverless, and AI workloads—with measurable results. <span class="tip" tabindex="0" data-tip="DoD 8140 refers to Department of Defense Directive 8140.01, which establishes a comprehensive qualification program for the DoD cyber workforce by replacing DoD 8570. It mandates that military personnel, civilians, and contractors performing cyber work meet specific training and certification requirements based on their defined roles within the DoD Cyber Workforce Framework (DCWF). The program emphasizes continuous professional development and allows for qualifications through experience and training, not just traditional certifications.">DoD 8140</span> compliant, GovCloud‑ready.</p>
+      <div class="cta-row">
+        <a class="btn primary" href="#projects">View Projects</a>
+        <a class="btn" href="#resume">Download Resume</a>
+        <a class="btn" href="https://github.com/PeteDor" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
-
-      <div class="card">
-        <h2>Architecture</h2>
-        <ul>
-          <li>CloudFront (edge) → API Gateway <strong>HTTP API</strong> → <strong>Lambda</strong> (Node.js 20)</li>
-          <li><strong>DynamoDB</strong> table <code class="kbd">contact_rate_limits</code> with TTL for per‑IP windowing</li>
-          <li><strong>Amazon SES</strong> (domain verified, DKIM/SPF aligned) for delivery</li>
-          <li>S3 static site; CloudFront Function injects security headers</li>
-        </ul>
-        <figure class="card" style="padding:0">
-          <img src="/assets/diagrams/contact-form-aws.png" alt="Architecture diagram: CloudFront → HTTP API → Lambda → DynamoDB TTL + SES; S3 hosts the static site" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:2880/1620;border-radius:14px;background:#fff" />
-          <figcaption>Diagram placeholder.</figcaption>
-        </figure>
+      <div class="proof" aria-label="Proof strip">
+        <div class="chip"><span class="dot" aria-hidden="true"></span> AWS SAA‑C03</div>
+        <div class="chip"><span class="dot" aria-hidden="true"></span> CCNP Enterprise</div>
+        <div class="chip"><span class="dot" aria-hidden="true"></span> USACE/DoD Experience</div>
       </div>
+    </section>
 
-      <div class="card">
-        <h2>Decisions &amp; Trade-offs</h2>
-        <ul>
-          <li><strong>HTTP API vs REST API:</strong> chose HTTP API for lower latency/cost; fewer built-ins like usage plans.</li>
-          <li><strong>DynamoDB TTL vs Redis:</strong> serverless and durable; slightly higher p99 than in-memory.</li>
-          <li><strong>Direct SES send vs SNS fan‑out:</strong> fewer moving parts now; SNS can be added later for archive/Slack.</li>
-          <li><strong>Single region:</strong> simpler/cheaper today; multi‑region is future work if the form becomes critical-path.</li>
-        </ul>
+    <!-- Projects -->
+    <section id="projects" class="container" aria-labelledby="projects-h">
+      <h2 id="projects-h">Projects</h2>
+      <div class="filters" id="search">
+        <label for="q" class="sr-only">Search projects</label>
+        <input id="q" class="input" type="search" placeholder="Search projects (press /)" aria-label="Search projects" />
+        <select id="filter-cloud" class="select" aria-label="Filter by cloud">
+          <option value="">All clouds</option>
+          <option>AWS</option>
+          <option>Azure</option>
+          <option>GCP</option>
+        </select>
+        <select id="filter-domain" class="select" aria-label="Filter by domain">
+          <option value="">All domains</option>
+          <option>Serverless</option>
+          <option>Networking</option>
+          <option>AI/ML</option>
+          <option>Security</option>
+          <option>Observability</option>
+        </select>
+        <select id="sort" class="select" aria-label="Sort projects">
+          <option value="impact" selected>Most impactful</option>
+          <option value="recent">Most recent</option>
+        </select>
       </div>
-
-      <div class="card">
-        <h2>Results</h2>
-        <div class="metrics">
-          <span class="metric">Latency P95 ~320 ms</span>
-          <span class="metric">Delivery &gt;99%</span>
-          <span class="metric">Cost/mo &lt;$0.10</span>
-          <span class="metric">Uptime 99.99%</span>
-        </div>
-        <p style="color:#9AA7B2;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:8px">Measured via curl + CloudWatch logs sampling; replace with screenshots as you gather more data.</p>
+      <div class="grid projects" id="project-list" role="list">
+        <!-- Project Card 1 -->
+        <article class="card" role="listitem"
+          data-cloud="AWS"
+          data-domain="Serverless"
+          data-impact="88"
+          data-date="2025-10-12">
+          <h3><a href="/case-studies/serverless-contact-form-aws/">
+            Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)
+          </a></h3>
+          <picture>
+            <img
+              src="/assets/diagrams/contact-form-aws.png"
+              alt="CloudFront → HTTP API → Lambda → DynamoDB TTL and SES; S3 hosts the static site"
+              class="card-img"
+              width="1280" height="720"
+              loading="lazy" decoding="async"
+            />
+          </picture>
+          <p class="meta">
+            Production-grade contact channel: API Gateway (HTTP) → Lambda (Node.js 20) with validation
+            and DynamoDB TTL rate-limit; Amazon SES for deliverability; S3 + CloudFront on the frontend.
+          </p>
+          <div class="metrics">
+            <span class="metric">Latency P95 ~320ms</span>
+            <span class="metric">Delivery &gt;99%</span>
+            <span class="metric">Cost/mo &lt;$0.10</span>
+          </div>
+          <div class="stack">
+            <span class="tag">API GW</span><span class="tag">Lambda</span>
+            <span class="tag">DynamoDB</span><span class="tag">SES</span>
+            <span class="tag">S3</span><span class="tag">CloudFront</span>
+          </div>
+        </article>
+        <!-- Project Card 2 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="Security" data-impact="95" data-date="2025-10-08">
+          <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>
+          <picture>
+            <img
+              src="/assets/diagrams/s3-cloudfront-edge-security.png"
+              alt="S3 + CloudFront Edge Security diagram"
+              class="card-img"
+              width="1280" height="720"
+              loading="lazy" decoding="async"
+            />
+          </picture>
+          <p class="meta">Static site on S3, CloudFront, ACM, Route 53. CloudFront Functions for redirects & headers; optional Lambda@Edge for signed URLs.</p>
+          <div class="metrics">
+            <span class="metric">LCP ≤ 1.8s</span>
+            <span class="metric">INP ≤ 160ms</span>
+            <span class="metric">CLS ≤ 0.05</span>
+          </div>
+          <div class="stack">
+            <span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Route 53</span><span class="tag">Lambda@Edge</span>
+          </div>
+        </article>
+        <!-- Project Card 3 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="AI/ML" data-impact="85" data-date="2025-08-16">
+          <h3><a href="/case-studies/polly-rekognition-demo/">Polly + Rekognition Serverless Demos</a></h3>
+          <p class="meta">API Gateway + Lambda with Cognito Hosted UI, per‑IP throttling (WAF), and no persistent storage. Rate‑limited public demo.</p>
+          <div class="metrics">
+            <span class="metric">Cost/mo ≈ $< 5</span>
+            <span class="metric">P95 480ms → 95ms</span>
+          </div>
+          <div class="stack">
+            <span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">Cognito</span><span class="tag">WAF</span><span class="tag">SSM</span>
+          </div>
+        </article>
+        <!-- Project Card 4 -->
+        <article class="card" role="listitem" data-cloud="AWS" data-domain="Networking" data-impact="90" data-date="2025-07-10">
+          <h3><a href="/case-studies/vpc-ha-reference/">VPC HA Reference — ALB + Multi‑AZ + RDS</a></h3>
+          <p class="meta">Multi‑AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, SNS ops alerts.</p>
+          <div class="metrics">
+            <span class="metric">Uptime 99.9% → 99.99%</span>
+            <span class="metric">Cost/mo $1,240 → $410</span>
+          </div>
+          <div class="stack">
+            <span class="tag">VPC</span><span class="tag">ALB</span><span class="tag">ASG</span><span class="tag">RDS</span><span class="tag">CloudWatch</span>
+          </div>
+        </article>
       </div>
+    </section>
 
-      <div class="card">
-        <h2>Cost &amp; Ops</h2>
-        <ul>
-          <li>API Gateway + Lambda: effectively free at current volume; DynamoDB on‑demand for a single read/write per submission.</li>
-          <li>SES out of sandbox; monitor bounces/complaints. Ensure DMARC policy is aligned.</li>
-          <li>CloudWatch alarms on 5XX rate and p95 latency; structured logs for request IDs and rate‑limit hits.</li>
-        </ul>
+    <!-- Resume -->
+    <section id="resume" class="container resume" aria-labelledby="resume-h">
+      <h2 id="resume-h">Resume</h2>
+      <p>Human‑readable résumé with a printable layout. For ATS, use the downloadable PDF version.</p>
+      <p class="dl">
+        <a class="btn" href="/assets/Peterson-Dorcelus-Resume.pdf" download>Download PDF</a>
+        <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn Profile</a>
+      </p>
+      <div class="card" aria-label="Resume summary">
+        <strong>Summary.</strong> AWS Certified Solutions Architect – Associate and CCNP with 10+ years across cloud infra, networking, and secure DoD operations. <span class="tip" tabindex="0" data-tip="DoD 8140 refers to Department of Defense Directive 8140.01, which establishes a comprehensive qualification program for the DoD cyber workforce by replacing DoD 8570. It mandates that military personnel, civilians, and contractors performing cyber work meet specific training and certification requirements based on their defined roles within the DoD Cyber Workforce Framework (DCWF). The program emphasizes continuous professional development and allows for qualifications through experience and training, not just traditional certifications.">DoD 8140</span> compliant, GovCloud‑ready.
       </div>
+    </section>
 
-      <div class="card">
-        <h2>Improvements</h2>
-        <ul>
-          <li>Add Cloudflare Turnstile or reCAPTCHA at higher traffic.</li>
-          <li>EventBridge for async fan‑out (archive to S3, Slack/Email multi-destination).</li>
-          <li>Promote to CDK stack bundling API, Lambda, DDB, and CF Function.</li>
-          <li>Optional multi‑region API + Route 53 health checks.</li>
-        </ul>
+    <!-- Docs -->
+    <section id="docs" class="container" aria-labelledby="docs-h">
+      <h2 id="docs-h">Docs</h2>
+      <div class="grid">
+        <article class="card">
+          <h3><a href="/docs/cloudfront-security-headers.html">CloudFront Security Headers — Pattern</a></h3>
+          <p class="meta">CSP, HSTS, Referrer‑Policy, Frame‑Options via CloudFront Functions. Includes code snippets.</p>
+        </article>
+        <article class="card">
+          <h3><a href="/docs/cognito-hosted-ui-notes.html">Cognito Hosted UI — Notes</a></h3>
+          <p class="meta">Hosted UI, OAuth flows, and Amplify Auth integration for gated demos.</p>
+        </article>
       </div>
-    </article>
+    </section>
 
-    <aside class="rail">
-      <div class="card">
-        <strong>Stack</strong>
-        <div class="stack" style="margin-top:8px">
-          <span class="tag">API Gateway (HTTP)</span>
-          <span class="tag">Lambda (Node.js 20)</span>
-          <span class="tag">DynamoDB TTL</span>
-          <span class="tag">Amazon SES</span>
-          <span class="tag">S3</span>
-          <span class="tag">CloudFront</span>
-        </div>
+    <!-- Contact -->
+    <section id="contact" class="container" aria-labelledby="contact-h">
+      <h2 id="contact-h">Contact</h2>
+        <form id="contact-form" method="post" action="">
+          <label for="name">Full name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required>
+
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required>
+
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="6" maxlength="5000" required></textarea>
+
+          <!-- Honeypot (spam trap) -->
+          <input type="text" name="company" tabindex="-1" autocomplete="off"
+                  style="position:absolute;left:-9999px;opacity:0;height:0;width:0">
+
+          <!-- keep your existing form markup -->
+          <button type="submit" id="send-btn">Send</button>
+        </form>
+
+   <p id="contact-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <footer>
+    <div class="container">
+      <div class="right-rail">
+        <span>© <span id="y"></span> Peterson “Pete” Dorcelus</span>
+        <span>Built with S3 + CloudFront. Deployed from GitHub.</span>
+        <span><a href="https://github.com/PeteDor" target="_blank" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a></span>
       </div>
+      <!-- In CloudFront, add security headers via Function/Lambda@Edge. See docs/cf-headers. -->
+    </div>
+  </footer>
+ 
+  <!-- Moved entire script to a seperate file-->   
+ <script src="/assets/site.js" defer></script>
 
-      <div class="card">
-        <strong>Repo</strong><br/>
-        <a href="https://github.com/PeteDor" target="_blank" rel="noopener">github.com/PeteDor</a>
-      </div>
-
-      <div class="card">
-        <strong>Demo</strong><br/>
-        <a href="/#contact" target="_blank" rel="noopener">petedorc.com/#contact</a>
-      </div>
-
-      <a class="btn primary" href="/#contact">Talk to me about this pattern</a>
-    </aside>
-  </section>
-</main>
 </body>
 </html>
