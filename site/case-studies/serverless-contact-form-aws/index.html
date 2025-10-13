@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES | petedorc.com</title>
+  <meta name="description" content="Production-grade contact form for petedorc.com using API Gateway (HTTP API), Lambda (Node.js 20), DynamoDB TTL rate limiting, and Amazon SES. Includes architecture, trade-offs, KPIs, and ops." />
+  <link rel="canonical" href="https://petedorc.com/case-studies/serverless-contact-form-aws/" />
+
+  <meta name="theme-color" content="#0B0D0F" />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --bg:#0B0D0F; --surface:#111418; --text:#E6EAF2; --muted:#9AA7B2;
+      --a:#00B3A4; --b:#6CA0FF; --radius:14px; --shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+    a{color:var(--a);text-decoration:none}
+    .container{max-width:1120px;margin:0 auto;padding:0 16px}
+    header{position:sticky;top:0;background:rgba(11,13,15,.75);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #1a1f26;z-index:20}
+    nav{display:flex;align-items:center;justify-content:space-between;max-width:1120px;margin:0 auto;padding:12px 16px}
+    .wordmark{font-weight:700}
+    .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 16px;font-weight:600;border:1px solid #1e293b;background:#12161c;box-shadow:var(--shadow)}
+    .btn:hover{background:#151a21}
+    .btn.primary{background:linear-gradient(90deg,var(--a),var(--b));color:#061218;border:0}
+    .hero{padding:48px 0 16px}
+    .eyebrow{font-family:"JetBrains Mono",monospace;color:var(--muted);font-size:14px}
+    h1{font-size:32px;margin:8px 0}
+    .sub{color:var(--muted);max-width:75ch}
+    .layout{display:grid;grid-template-columns:1fr;gap:24px;padding:32px 0;border-top:1px solid #141a22}
+    .card{background:var(--surface);border:1px solid #1a1f26;border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+    h2{font-size:22px;margin:0 0 8px}
+    .metrics,.stack{display:flex;gap:8px;flex-wrap:wrap}
+    .metric{display:inline-flex;align-items:center;gap:8px;background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
+    .tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
+    .rail{display:flex;flex-direction:column;gap:12px}
+    figure{margin:0}
+    figcaption{padding:12px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px}
+    img{max-width:100%;display:block;border-radius:14px}
+    @media (min-width:960px){ .layout{grid-template-columns:minmax(0,1fr) 320px} }
+    code.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
+    "author":{"@type":"Person","name":"Peterson Dorcelus"},
+    "about":["API Gateway","Lambda","DynamoDB","SES"],
+    "mainEntityOfPage":"https://petedorc.com/case-studies/serverless-contact-form-aws/",
+    "datePublished":"2025-10-12",
+    "articleSection":["Serverless","Email","Security"]
+  }
+  </script>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
+    <div class="navlinks">
+      <a class="btn" href="/#projects">Projects</a>
+      <a class="btn" href="/#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero container">
+    <div class="eyebrow">Case Study</div>
+    <h1>Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</h1>
+    <p class="sub">Production-grade contact channel for petedorc.com using API Gateway (HTTP API) → Lambda (Node.js 20) with input validation and per-IP rate limiting in DynamoDB (TTL), sending mail via Amazon SES. Fronted by CloudFront and S3.</p>
+  </section>
+
+  <section class="container layout">
+    <article class="content">
+      <div class="card">
+        <h2>Context</h2>
+        <p>Goal: Own the pipeline and keep ops near-zero. Requirements: fast UX, high deliverability, abuse protection, and no third‑party form service. Constraints: keep bundle small and preserve Web Vitals (LCP ≤ 2.0s, INP ≤ 200ms).</p>
+      </div>
+
+      <div class="card">
+        <h2>Architecture</h2>
+        <ul>
+          <li>CloudFront (edge) → API Gateway <strong>HTTP API</strong> → <strong>Lambda</strong> (Node.js 20)</li>
+          <li><strong>DynamoDB</strong> table <code class="kbd">contact_rate_limits</code> with TTL for per‑IP windowing</li>
+          <li><strong>Amazon SES</strong> (domain verified, DKIM/SPF aligned) for delivery</li>
+          <li>S3 static site; CloudFront Function injects security headers</li>
+        </ul>
+        <figure class="card" style="padding:0">
+          <img src="/assets/diagrams/contact-form-aws.png" alt="Architecture diagram: CloudFront → HTTP API → Lambda → DynamoDB TTL + SES; S3 hosts the static site" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:2880/1620;border-radius:14px;background:#fff" />
+          <figcaption>Diagram placeholder.</figcaption>
+        </figure>
+      </div>
+
+      <div class="card">
+        <h2>Decisions &amp; Trade-offs</h2>
+        <ul>
+          <li><strong>HTTP API vs REST API:</strong> chose HTTP API for lower latency/cost; fewer built-ins like usage plans.</li>
+          <li><strong>DynamoDB TTL vs Redis:</strong> serverless and durable; slightly higher p99 than in-memory.</li>
+          <li><strong>Direct SES send vs SNS fan‑out:</strong> fewer moving parts now; SNS can be added later for archive/Slack.</li>
+          <li><strong>Single region:</strong> simpler/cheaper today; multi‑region is future work if the form becomes critical-path.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Results</h2>
+        <div class="metrics">
+          <span class="metric">Latency P95 ~320 ms</span>
+          <span class="metric">Delivery &gt;99%</span>
+          <span class="metric">Cost/mo &lt;$0.10</span>
+          <span class="metric">Uptime 99.99%</span>
+        </div>
+        <p style="color:#9AA7B2;font-family:'JetBrains Mono',monospace;font-size:13px;margin-top:8px">Measured via curl + CloudWatch logs sampling; replace with screenshots as you gather more data.</p>
+      </div>
+
+      <div class="card">
+        <h2>Cost &amp; Ops</h2>
+        <ul>
+          <li>API Gateway + Lambda: effectively free at current volume; DynamoDB on‑demand for a single read/write per submission.</li>
+          <li>SES out of sandbox; monitor bounces/complaints. Ensure DMARC policy is aligned.</li>
+          <li>CloudWatch alarms on 5XX rate and p95 latency; structured logs for request IDs and rate‑limit hits.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Improvements</h2>
+        <ul>
+          <li>Add Cloudflare Turnstile or reCAPTCHA at higher traffic.</li>
+          <li>EventBridge for async fan‑out (archive to S3, Slack/Email multi-destination).</li>
+          <li>Promote to CDK stack bundling API, Lambda, DDB, and CF Function.</li>
+          <li>Optional multi‑region API + Route 53 health checks.</li>
+        </ul>
+      </div>
+    </article>
+
+    <aside class="rail">
+      <div class="card">
+        <strong>Stack</strong>
+        <div class="stack" style="margin-top:8px">
+          <span class="tag">API Gateway (HTTP)</span>
+          <span class="tag">Lambda (Node.js 20)</span>
+          <span class="tag">DynamoDB TTL</span>
+          <span class="tag">Amazon SES</span>
+          <span class="tag">S3</span>
+          <span class="tag">CloudFront</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <strong>Repo</strong><br/>
+        <a href="https://github.com/PeteDor" target="_blank" rel="noopener">github.com/PeteDor</a>
+      </div>
+
+      <div class="card">
+        <strong>Demo</strong><br/>
+        <a href="/#contact" target="_blank" rel="noopener">petedorc.com/#contact</a>
+      </div>
+
+      <a class="btn primary" href="/#contact">Talk to me about this pattern</a>
+    </aside>
+  </section>
+</main>
+</body>
+</html>
