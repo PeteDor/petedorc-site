@@ -196,6 +196,39 @@
       </div>
       <div class="grid projects" id="project-list" role="list">
         <!-- Project Card 1 -->
+        <article class="card" role="listitem"
+          data-cloud="AWS"
+          data-domain="Serverless"
+          data-impact="88"
+          data-date="2025-10-12">
+          <h3><a href="/case-studies/serverless-contact-form-aws/">
+            Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)
+          </a></h3>
+          <picture>
+            <img
+              src="/assets/diagrams/contact-form-aws.png"
+              alt="CloudFront → HTTP API → Lambda → DynamoDB TTL and SES; S3 hosts the static site"
+              class="card-img"
+              width="1280" height="720"
+              loading="lazy" decoding="async"
+            />
+          </picture>
+          <p class="meta">
+            Production-grade contact channel: API Gateway (HTTP) → Lambda (Node.js 20) with validation
+            and DynamoDB TTL rate-limit; Amazon SES for deliverability; S3 + CloudFront on the frontend.
+          </p>
+          <div class="metrics">
+            <span class="metric">Latency P95 ~320ms</span>
+            <span class="metric">Delivery &gt;99%</span>
+            <span class="metric">Cost/mo &lt;$0.10</span>
+          </div>
+          <div class="stack">
+            <span class="tag">API GW</span><span class="tag">Lambda</span>
+            <span class="tag">DynamoDB</span><span class="tag">SES</span>
+            <span class="tag">S3</span><span class="tag">CloudFront</span>
+          </div>
+        </article>
+        <!-- Project Card 2 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Security" data-impact="95" data-date="2025-10-08">
           <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>
           <picture>
@@ -217,7 +250,7 @@
             <span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Route 53</span><span class="tag">Lambda@Edge</span>
           </div>
         </article>
-        <!-- Project Card 2 -->
+        <!-- Project Card 3 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="AI/ML" data-impact="85" data-date="2025-08-16">
           <h3><a href="/case-studies/polly-rekognition-demo/">Polly + Rekognition Serverless Demos</a></h3>
           <p class="meta">API Gateway + Lambda with Cognito Hosted UI, per‑IP throttling (WAF), and no persistent storage. Rate‑limited public demo.</p>
@@ -229,7 +262,7 @@
             <span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">Cognito</span><span class="tag">WAF</span><span class="tag">SSM</span>
           </div>
         </article>
-        <!-- Project Card 3 -->
+        <!-- Project Card 4 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Networking" data-impact="90" data-date="2025-07-10">
           <h3><a href="/case-studies/vpc-ha-reference/">VPC HA Reference — ALB + Multi‑AZ + RDS</a></h3>
           <p class="meta">Multi‑AZ VPC with public/private subnets, NAT, ALB, EC2 ASG, RDS MySQL, CloudWatch alarms, SNS ops alerts.</p>
