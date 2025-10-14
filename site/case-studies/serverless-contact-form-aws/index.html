@@ -43,45 +43,68 @@
     img{max-width:100%;display:block;border-radius:14px}
     @media (min-width:960px){ .layout{grid-template-columns:minmax(0,1fr) 320px} }
     code.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}
-  </style>
+  
+         /* Lightbox dialog */
+         .lightbox {
+           padding: 0; border: 0; background: transparent; width: auto; max-width: none;
+         }
+         .lightbox::backdrop { background: rgba(0,0,0,.78); }
+         .lightbox__img {
+           display: block; max-width: 90vw; max-height: 90vh; border-radius: 14px;
+           box-shadow: 0 10px 30px rgba(0,0,0,.5);
+         }
+         .lightbox__close {
+           position: absolute; top: 12px; right: 12px; border: 1px solid #1e293b;
+           background: #111418; color: #E6EAF2; border-radius: 999px; padding: 8px 10px;
+           font: inherit; cursor: pointer;
+         }
+         @media (prefers-reduced-motion: no-preference) {
+           .lightbox[open] .lightbox__img { animation: lb-zoom .12s ease-out; }
+           @keyframes lb-zoom { from { transform: scale(.97); opacity: .6; } to { transform: scale(1); opacity: 1; } }
+         }
 
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"Article",
-    "headline":"Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
-    "author":{"@type":"Person","name":"Peterson Dorcelus"},
-    "about":["API Gateway","Lambda","DynamoDB","SES"],
-    "mainEntityOfPage":"https://petedorc.com/case-studies/serverless-contact-form-aws/",
-    "datePublished":"2025-10-12",
-    "articleSection":["Serverless","Email","Security"]
-  }
-  </script>
-</head>
-<body>
-<header>
-  <nav>
-    <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
-    <div class="navlinks">
-      <a class="btn" href="/#projects">Projects</a>
-      <a class="btn" href="/#contact">Contact</a>
-    </div>
-  </nav>
-</header>
+         /* Make zoomable images feel clickable */
+         img[data-zoom] { cursor: zoom-in; }
 
-<main>
-  <section class="hero container">
-    <div class="eyebrow">Case Study</div>
-    <h1>Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</h1>
-    <p class="sub">Production-grade contact channel for petedorc.com using API Gateway (HTTP API) → Lambda (Node.js 20) with input validation and per-IP rate limiting in DynamoDB (TTL), sending mail via Amazon SES. Fronted by CloudFront and S3.</p>
-  </section>
+         </style>
 
-  <section class="container layout">
-    <article class="content">
-      <div class="card">
-        <h2>Context</h2>
-        <p>Goal: Own the pipeline and keep ops near-zero. Requirements: fast UX, high deliverability, abuse protection, and no third‑party form service. Constraints: keep bundle small and preserve Web Vitals (LCP ≤ 2.0s, INP ≤ 200ms).</p>
-      </div>
+         <script type="application/ld+json">
+         {
+           "@context":"https://schema.org",
+           "@type":"Article",
+           "headline":"Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
+           "author":{"@type":"Person","name":"Peterson Dorcelus"},
+           "about":["API Gateway","Lambda","DynamoDB","SES"],
+           "mainEntityOfPage":"https://petedorc.com/case-studies/serverless-contact-form-aws/",
+           "datePublished":"2025-10-12",
+           "articleSection":["Serverless","Email","Security"]
+         }
+         </script>
+       </head>
+       <body>
+       <header>
+         <nav>
+           <div class="wordmark"><a href="/">petedorc<span style="color:#00B3A4">.com</span></a></div>
+           <div class="navlinks">
+             <a class="btn" href="/#projects">Projects</a>
+             <a class="btn" href="/#contact">Contact</a>
+           </div>
+         </nav>
+       </header>
+
+       <main>
+         <section class="hero container">
+           <div class="eyebrow">Case Study</div>
+           <h1>Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</h1>
+           <p class="sub">Production-grade contact channel for petedorc.com using API Gateway (HTTP API) → Lambda (Node.js 20) with input validation and per-IP rate limiting in DynamoDB (TTL), sending mail via Amazon SES. Fronted by CloudFront and S3.</p>
+         </section>
+
+         <section class="container layout">
+           <article class="content">
+             <div class="card">
+               <h2>Context</h2>
+               <p>Goal: Own the pipeline and keep ops near-zero. Requirements: fast UX, high deliverability, abuse protection, and no third‑party form service. Constraints: keep bundle small and preserve Web Vitals (LCP ≤ 2.0s, INP ≤ 200ms).</p>
+             </div>
 
       <div class="card">
         <h2>Architecture</h2>
@@ -91,10 +114,36 @@
           <li><strong>Amazon SES</strong> (domain verified, DKIM/SPF aligned) for delivery</li>
           <li>S3 static site; CloudFront Function injects security headers</li>
         </ul>
-        <figure class="card" style="padding:0">
-          <img src="/assets/diagrams/contact-form-aws.png" alt="Architecture diagram: CloudFront → HTTP API → Lambda → DynamoDB TTL + SES; S3 hosts the static site" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:2880/1620;border-radius:14px;background:#fff" />
-          <figcaption>Diagram placeholder.</figcaption>
-        </figure>
+  <figure class="card" style="padding:0">
+   <picture>
+    <!-- Prefer SVG for crisp zoom; PNG as fallback -->
+    <source type="image/svg+xml" srcset="/assets/diagrams/contact-form-aws_architecture.svg">
+    <img
+      src="/assets/diagrams/contact-form-aws_architecture.png"
+      alt="CloudFront → HTTP API → Lambda → DynamoDB TTL + SES; S3 hosts static site"
+      class="card-img"
+      width="1280" height="720"
+      loading="lazy" decoding="async"
+      data-zoom
+    />
+   </picture>
+  <figcaption>Serverless Contact Form — architecture overview.</figcaption>
+ </figure>
+
+  <figure class="card" style="padding:0; margin-top:16px">
+   <picture>
+    <source type="image/svg+xml" srcset="/assets/diagrams/contact-form-aws_sequence.svg">
+    <img
+      src="/assets/diagrams/contact-form-aws_sequence.png"
+      alt="Request lifecycle: Browser → CloudFront → API Gateway → Lambda → DynamoDB/SES with 429 branch"
+      class="card-img"
+      width="1280" height="720"
+      loading="lazy" decoding="async"
+      data-zoom
+    />
+   </picture>
+  <figcaption>Request lifecycle with rate-limit branch (429) and happy path.</figcaption>
+  </figure>
       </div>
 
       <div class="card">
@@ -162,8 +211,43 @@
       </div>
 
       <a class="btn primary" href="/#contact">Talk to me about this pattern</a>
+
     </aside>
   </section>
 </main>
+      <dialog id="lightbox" class="lightbox" aria-label="Image preview">
+       <img id="lightbox-img" class="lightbox__img" alt="">
+       <button id="lightbox-close" class="lightbox__close" aria-label="Close">✕</button>
+      </dialog>
+
+<script>
+  (function () {
+    const dlg = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    const btn = document.getElementById('lightbox-close');
+    let lastFocus = null;
+
+    document.querySelectorAll('img[data-zoom]').forEach(el => {
+      el.addEventListener('click', () => {
+        lastFocus = document.activeElement;
+        img.src = el.currentSrc || el.src;
+        img.alt = el.alt || '';
+        dlg.showModal();
+        btn.focus();
+      });
+    });
+
+    btn.addEventListener('click', () => dlg.close());
+    dlg.addEventListener('cancel', e => { e.preventDefault(); dlg.close(); });
+    dlg.addEventListener('click', e => {
+      const r = img.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
+    });
+    dlg.addEventListener('close', () => {
+      img.removeAttribute('src');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    });
+  })();
+</script>
 </body>
 </html>
