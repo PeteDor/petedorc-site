@@ -38,8 +38,27 @@
     .metric{display:inline-flex;align-items:center;gap:8px;background:#0e141a;border:1px solid #1e2734;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
     .tag{display:inline-flex;align-items:center;gap:8px;background:#0f1318;border:1px solid #1a2230;border-radius:999px;padding:6px 10px;color:#c7d2e0;font-size:13px}
     .rail{display:flex;flex-direction:column;gap:12px}
-    figure{margin:0}
+
+figure { margin: 0; }
+figure.card { padding: 0; }
+figure.card picture { display: block; }
+figure.card .card-img {
+  display: block;
+  width: 100%;
+  height: auto;        /* let the image define height */
+  aspect-ratio: auto;  /* undo any preset ratio */
+  object-fit: contain; /* avoid cropping if a height sneaks in */
+}
+figure.card figcaption {
+  margin-top: 8px;
+  padding: 12px;
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+}
+
     figcaption{padding:12px;color:var(--muted);font-family:"JetBrains Mono",monospace;font-size:13px}
+
     img{max-width:100%;display:block;border-radius:14px}
     @media (min-width:960px){ .layout{grid-template-columns:minmax(0,1fr) 320px} }
     code.kbd{font-family:"JetBrains Mono",monospace;font-size:13px;color:#cbd5e1}
@@ -69,17 +88,24 @@
          </style>
 
          <script type="application/ld+json">
-         {
-           "@context":"https://schema.org",
-           "@type":"Article",
-           "headline":"Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
-           "author":{"@type":"Person","name":"Peterson Dorcelus"},
-           "about":["API Gateway","Lambda","DynamoDB","SES"],
-           "mainEntityOfPage":"https://petedorc.com/case-studies/serverless-contact-form-aws/",
-           "datePublished":"2025-10-12",
-           "articleSection":["Serverless","Email","Security"]
-         }
-         </script>
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Serverless Contact Form on AWS — HTTP API + Lambda + DynamoDB TTL + SES",
+  "about": [
+    "API Gateway",
+    "Lambda",
+    "DynamoDB",
+    "SES"
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "Peterson Dorcelus"
+  },
+  "datePublished": "2025-10-12",
+  "mainEntityOfPage": "https://petedorc.com/case-studies/serverless-contact-form-aws/"
+}
+</script>
        </head>
        <body>
        <header>
@@ -123,9 +149,9 @@
       alt="CloudFront → HTTP API → Lambda → DynamoDB TTL + SES; S3 hosts static site"
       class="card-img"
       width="1280" height="720"
-      loading="lazy" decoding="async"
+      loading="eager" decoding="async"
       data-zoom
-    />
+    / fetchpriority="high" sizes="(min-width: 960px) 800px, 100vw">
    </picture>
   <figcaption>Serverless Contact Form — architecture overview.</figcaption>
  </figure>
@@ -202,7 +228,7 @@
 
       <div class="card">
         <strong>Repo</strong><br/>
-        <a href="https://github.com/PeteDor" target="_blank" rel="noopener">github.com/PeteDor</a>
+        <a href="https://github.com/PeteDor" target="_blank" rel="noopener noreferrer">github.com/PeteDor</a>
       </div>
 
       <div class="card">
@@ -221,33 +247,44 @@
       </dialog>
 
 <script>
-  (function () {
-    const dlg = document.getElementById('lightbox');
-    const img = document.getElementById('lightbox-img');
-    const btn = document.getElementById('lightbox-close');
-    let lastFocus = null;
+  // Feature detection
+  const dlg = document.getElementById('lightbox');
+  const dlgImg = document.getElementById('lightbox-img');
+  const dlgBtn = document.getElementById('lightbox-close');
+  let lastFocus = null;
 
-    document.querySelectorAll('img[data-zoom]').forEach(el => {
-      el.addEventListener('click', () => {
-        lastFocus = document.activeElement;
-        img.src = el.currentSrc || el.src;
-        img.alt = el.alt || '';
-        dlg.showModal();
-        btn.focus();
-      });
-    });
+  // Event delegation so it works for any current/future images
+  document.addEventListener('click', (e) => {
+    const img = e.target.closest('img[data-zoom]');
+    if (!img) return;
 
-    btn.addEventListener('click', () => dlg.close());
-    dlg.addEventListener('cancel', e => { e.preventDefault(); dlg.close(); });
-    dlg.addEventListener('click', e => {
-      const r = img.getBoundingClientRect();
-      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) dlg.close();
-    });
-    dlg.addEventListener('close', () => {
-      img.removeAttribute('src');
-      if (lastFocus && lastFocus.focus) lastFocus.focus();
-    });
-  })();
+    e.preventDefault();
+    const src = img.currentSrc || img.src;
+    const alt = img.alt || '';
+
+    // Prefer <dialog>, fallback opens the image in a new tab
+    if (dlg && typeof dlg.showModal === 'function') {
+      lastFocus = document.activeElement;
+      dlgImg.src = src;
+      dlgImg.alt = alt;
+      dlg.showModal();
+      dlgBtn?.focus();
+    } else {
+      window.open(src, '_blank', 'noopener,noreferrer');
+    }
+  });
+
+  dlgBtn?.addEventListener('click', () => dlg.close());
+  dlg?.addEventListener('cancel', (e) => { e.preventDefault(); dlg.close(); });
+  dlg?.addEventListener('click', (e) => {
+    const r = dlgImg.getBoundingClientRect();
+    const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    if (outside) dlg.close();
+  });
+  dlg?.addEventListener('close', () => {
+    dlgImg.removeAttribute('src');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  });
 </script>
 </body>
 </html>
