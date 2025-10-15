@@ -92,3 +92,73 @@ apply();
 
 // ---------------- Footer year ----------------
 const y = $('#y'); if (y) y.textContent = new Date().getFullYear();
+
+
+/* --- Contact form UX (added by Cloud Coach) --- */
+(() => {
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('contact-status');
+  const btn = document.getElementById('send-btn');
+
+  if (!form || !btn || !status) return;
+
+  const api = form.getAttribute('action') || '';
+
+  const postJSON = async (url, data) => {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      credentials: 'omit',
+    });
+  };
+
+  const setStatus = (msg) => { status.textContent = msg; };
+  const setBusy = (busy) => {
+    btn.disabled = busy;
+    btn.textContent = busy ? 'Sending…' : 'Send';
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setStatus('');
+
+    if (!api) { setStatus('Form is not configured yet.'); return; }
+
+    // honeypot trap: silently accept
+    const hp = form.querySelector('input[name="company"]');
+    if (hp && hp.value) { setStatus('Thanks!'); return; }
+
+    const payload = {
+      name: (form.name?.value || '').trim(),
+      email: (form.email?.value || '').trim(),
+      message: (form.message?.value || '').trim(),
+      meta: { path: location.pathname, ref: document.referrer || '' }
+    };
+
+    if (!payload.name || !payload.email || !payload.message) {
+      setStatus('Please fill in name, email, and message.');
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const res = await postJSON(api, payload);
+      if (res.status === 429) {
+        setStatus('Rate limit: try again shortly.');
+      } else if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        console.error('Send failed:', res.status, txt);
+        setStatus('Send failed. Please try again.');
+      } else {
+        setStatus('Message sent. Check your inbox for confirmation.');
+        form.reset();
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('Network error. Please try again.');
+    } finally {
+      setBusy(false);
+    }
+  });
+})();
