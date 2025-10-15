@@ -175,7 +175,7 @@
       <div class="grid projects" id="project-list" role="list">
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Serverless" data-impact="88" data-date="2025-10-12">
           <h3><a href="/case-studies/serverless-contact-form-aws/">Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</a></h3>
-          <img class="card-img" src="/assets/diagrams/contact-form-aws.png" alt="CloudFront → HTTP API → Lambda → DynamoDB TTL and SES; S3 hosts the static site" width="1280" height="720" loading="lazy" decoding="async"/>
+          <img class="card-img" src="/assets/diagrams/contact-form-aws_sequence.svg" alt="CloudFront → HTTP API → Lambda → DynamoDB TTL and SES; S3 hosts the static site" width="1280" height="720" loading="lazy" decoding="async"/>
           <p class="meta">Production-grade contact channel using API Gateway (HTTP), Lambda (Node.js 20) with validation and DynamoDB TTL rate‑limit, SES for deliverability; S3 + CloudFront frontend.</p>
           <div class="metrics"><span class="metric">Latency P95 ~320ms</span><span class="metric">Delivery &gt;99%</span><span class="metric">Cost/mo &lt;$0.10</span></div>
           <div class="stack"><span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">DynamoDB</span><span class="tag">SES</span><span class="tag">S3</span><span class="tag">CloudFront</span></div>
