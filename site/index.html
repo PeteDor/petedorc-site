@@ -141,8 +141,10 @@
       </nav>
     </div>
   </header>
-
+  
   <main id="main">
+    
+    <!-- Hero -->
     <section class="hero container" aria-label="Intro">
       <div class="eyebrow">Available for Staff/Senior Cloud Architect roles</div>
       <h1>Designing resilient, cost‑efficient cloud systems on AWS.</h1>
@@ -154,7 +156,8 @@
         <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </section>
-
+    
+    <!-- Projects -->
     <section id="projects" class="container" aria-labelledby="projects-h">
       <h2 id="projects-h">Projects</h2>
       <div class="filters" id="search">
@@ -173,6 +176,8 @@
       </div>
 
       <div class="grid projects" id="project-list" role="list">
+        
+        <!-- Project Card 1 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Serverless" data-impact="88" data-date="2025-10-12">
           <h3><a href="/case-studies/serverless-contact-form-aws/">Serverless Contact Form on AWS (HTTP API + Lambda + DynamoDB TTL + SES)</a></h3>
           <img class="card-img" src="/assets/diagrams/contact-form-aws_sequence.svg" alt="CloudFront → HTTP API → Lambda → DynamoDB TTL and SES; S3 hosts the static site" width="1280" height="720" loading="lazy" decoding="async"/>
@@ -180,7 +185,8 @@
           <div class="metrics"><span class="metric">Latency P95 ~320ms</span><span class="metric">Delivery &gt;99%</span><span class="metric">Cost/mo &lt;$0.10</span></div>
           <div class="stack"><span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">DynamoDB</span><span class="tag">SES</span><span class="tag">S3</span><span class="tag">CloudFront</span></div>
         </article>
-
+        
+        <!-- Project Card 2 -->
         <article class="card" role="listitem" data-cloud="AWS" data-domain="Security" data-impact="95" data-date="2025-10-08">
           <h3><a href="/case-studies/s3-cloudfront-edge-security/">S3 + CloudFront Portfolio with Edge Security</a></h3>
           <img class="card-img" src="/assets/diagrams/s3-cloudfront-edge-security.png" alt="S3 + CloudFront edge security diagram" width="1280" height="720" loading="lazy" decoding="async"/>
@@ -188,16 +194,10 @@
           <div class="metrics"><span class="metric">LCP ≤ 1.8s</span><span class="metric">INP ≤ 160ms</span><span class="metric">CLS ≤ 0.05</span></div>
           <div class="stack"><span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Route 53</span><span class="tag">Lambda@Edge</span></div>
         </article>
-
-        <article class="card" role="listitem" data-cloud="AWS" data-domain="AI/ML" data-impact="85" data-date="2025-08-16">
-          <h3><a href="/case-studies/polly-rekognition-demo/">Polly + Rekognition Serverless Demos</a></h3>
-          <p class="meta">API Gateway + Lambda with Cognito Hosted UI, per‑IP throttling (WAF), and no persistent storage. Rate‑limited public demo.</p>
-          <div class="metrics"><span class="metric">Cost/mo ≈ $&lt;5</span><span class="metric">P95 480ms → 95ms</span></div>
-          <div class="stack"><span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">Cognito</span><span class="tag">WAF</span><span class="tag">SSM</span></div>
-        </article>
       </div>
     </section>
 
+    <!-- Resume -->
     <section id="resume" class="container resume" aria-labelledby="resume-h">
       <h2 id="resume-h">Resume</h2>
       <p>Downloadable ATS‑optimized and printer‑friendly résumé.</p>
@@ -210,6 +210,7 @@
       </div>
     </section>
 
+    <!-- Docs -->
     <section id="docs" class="container" aria-labelledby="docs-h">
       <h2 id="docs-h">Docs</h2>
       <div class="grid">
@@ -224,6 +225,7 @@
       </div>
     </section>
 
+    <!-- Contact -->
     <section id="contact" class="container" aria-labelledby="contact-h">
       <h2 id="contact-h">Contact</h2>
       <form id="contact-form" method="post" action="https://0jiv1eimu2.execute-api.us-east-1.amazonaws.com/prod">
