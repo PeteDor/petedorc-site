@@ -93,6 +93,18 @@
     @media(min-width:720px){ h1{font-size:40px} .card{grid-column:span 6} }
     @media(min-width:1040px){ .card{grid-column:span 4} }
 
+    /* Coming Soon Styling*/
+    .coming { position: relative; opacity:.85 }
+    .coming .badge { 
+    position:absolute; top:12px; right:12px; 
+    background:#18212c; border:1px solid #253142; 
+    padding:4px 8px; border-radius:999px; font-size:12px; color:#9fb4c9;
+    }
+    .card[aria-disabled="true"] a { pointer-events:none; }
+    .muted { color:#9AA7B2 }
+
+
+
     .card-img{background:#fff;border:1px solid #1e2734;border-radius:12px;width:100%;height:auto;display:block;margin:8px 0 10px;aspect-ratio:16/9}
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
     /* Tooltip (CSS-only, accessible) */
@@ -122,27 +134,27 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"Person","name":"Peterson “Pete” Dorcelus","alternateName":"Pete Dorcelus","jobTitle":"Cloud Architect","url":"https://petedorc.com","email":"mailto:PDorcelus@gmail.com","sameAs":["https://github.com/PeteDor","https://www.linkedin.com/in/petersondorcelus/"]}
   </script>
-</head>
-<body>
-  <a class="skip" href="#main">Skip to content</a>
-  <header>
-    <div class="container">
-      <nav aria-label="Primary">
-        <div class="brand">
-          <div class="wordmark">petedorc<span style="color:var(--a)">.com</span> <small>Cloud Architect</small></div>
-        </div>
-        <div class="navlinks" role="menubar">
-          <a role="menuitem" href="#projects">Projects</a>
-          <a role="menuitem" href="#resume">Resume</a>
-          <a role="menuitem" href="#docs">Docs</a>
-          <a role="menuitem" href="#search" title="Press / to search">Search</a>
-          <a role="menuitem" href="#contact" class="btn">Contact</a>
-        </div>
-      </nav>
-    </div>
-  </header>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header>
+      <div class="container">
+        <nav aria-label="Primary">
+          <div class="brand">
+            <div class="wordmark">petedorc<span style="color:var(--a)">.com</span> <small>Cloud Architect</small></div>
+          </div>
+          <div class="navlinks" role="menubar">
+            <a role="menuitem" href="#projects">Projects</a>
+            <a role="menuitem" href="#resume">Resume</a>
+            <a role="menuitem" href="#docs">Docs</a>
+            <a role="menuitem" href="#search" title="Press / to search">Search</a>
+            <a role="menuitem" href="#contact" class="btn">Contact</a>
+          </div>
+        </nav>
+      </div>
+    </header>
   
-  <main id="main">
+    <main id="main">
     
     <!-- Hero -->
     <section class="hero container" aria-label="Intro">
@@ -156,10 +168,11 @@
         <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </section>
-    
+
     <!-- Projects -->
     <section id="projects" class="container" aria-labelledby="projects-h">
       <h2 id="projects-h">Projects</h2>
+      <p class="meta muted">Two case studies live today — two more in the works.</p>
       <div class="filters" id="search">
         <label for="q" class="sr-only">Search projects</label>
         <input id="q" class="input" type="search" placeholder="Search projects (press /)" aria-label="Search projects" />
@@ -194,6 +207,24 @@
           <div class="metrics"><span class="metric">LCP ≤ 1.8s</span><span class="metric">INP ≤ 160ms</span><span class="metric">CLS ≤ 0.05</span></div>
           <div class="stack"><span class="tag">AWS</span><span class="tag">S3</span><span class="tag">CloudFront</span><span class="tag">Route 53</span><span class="tag">Lambda@Edge</span></div>
         </article>
+
+        <!-- Coming soon: Polly + Rekognition -->
+       <article class="card coming" role="listitem" aria-disabled="true" data-cloud="AWS" data-domain="AI/ML" data-impact="80" data-date="2025-11-01">
+         <span class="badge">Coming soon</span>
+         <h3>Polly + Rekognition Serverless Demos</h3>
+         <img class="card-img" src="/assets/diagrams/placeholder-aiml.png" alt="Serverless demo architecture placeholder" width="1280" height="720" loading="lazy" decoding="async"/>
+         <p class="meta muted">Public demo with API Gateway + Lambda. Text-to-speech (Polly) and image analysis (Rekognition). Rate-limited, no persistent storage.</p>
+         <div class="stack"><span class="tag">API GW</span><span class="tag">Lambda</span><span class="tag">Polly</span><span class="tag">Rekognition</span><span class="tag">WAF</span></div>
+       </article>
+
+       <!-- Coming soon: VPC HA Reference -->
+       <article class="card coming" role="listitem" aria-disabled="true" data-cloud="AWS" data-domain="Networking" data-impact="90" data-date="2025-11-08">
+         <span class="badge">Coming soon</span>
+         <h3>VPC HA Reference — ALB + Multi-AZ + RDS</h3>
+         <img class="card-img" src="/assets/diagrams/placeholder-vpc.png" alt="VPC high availability reference architecture placeholder" width="1280" height="720" loading="lazy" decoding="async"/>
+         <p class="meta muted">Production-ready reference: 2-AZ subnets, ALB, Auto Scaling, RDS Multi-AZ, NAT gateways, SSM Session Manager, WAF at the edge. CDK-based.</p>
+         <div class="stack"><span class="tag">VPC</span><span class="tag">ALB</span><span class="tag">Auto Scaling</span><span class="tag">RDS</span><span class="tag">CDK</span></div>
+       </article>
       </div>
     </section>
 
