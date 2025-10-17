@@ -128,6 +128,17 @@
       transition:opacity .12s ease, transform .12s ease;
     }
     .tip:hover::after, .tip:focus-visible::after{opacity:1; transform:translateY(0);}
+    .badge-row { 
+      align-items: center; 
+    }
+    #certs .badge-row{
+      display:flex; 
+      gap:.75rem; 
+      flex-wrap:wrap; 
+      padding:0; 
+      margin:.5rem 0 0;
+     justify-content:flex-start;   /* <— keep left-aligned inside container */
+    }
   </style>
 
   <!-- JSON-LD -->
@@ -168,6 +179,67 @@
         <a class="btn" href="https://www.linkedin.com/in/petersondorcelus/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </section>
+
+    <!-- Certification Section -->
+    <section id="certs" aria-labelledby="certs-title">
+    <section id="certs" class="container" aria-labelledby="certs-title">
+
+     <h2 id="certs-title" class="sect-title">Certifications</h2>
+
+     <ul class="badge-row" role="list">
+      <li>
+       <a class="badge" href="https://www.credly.com/badges/<AWS-SAA-ID>/public_url" target="_blank" rel="noopener">
+        <img src="assets/badges/aws-saa.png" alt="AWS Certified Solutions Architect – Associate badge" width="64" height="64" loading="lazy" decoding="async">
+        <span>AWS Solutions Architect – Associate</span>
+       </a>
+      </li>
+      <li>
+       <a class="badge" href="https://www.credly.com/badges/<AWS-CCP-ID>/public_url" target="_blank" rel="noopener">
+        <img src="assets/badges/aws-ccp.png" alt="AWS Certified Cloud Practitioner badge" width="64" height="64" loading="lazy" decoding="async">
+        <span>AWS Cloud Practitioner</span>
+       </a>
+      </li>
+      <li>
+       <a class="badge" href="https://www.credly.com/badges/<CLOUDPLUS-ID>/public_url" target="_blank" rel="noopener">
+        <img src="assets/badges/comptia-cloudplus.png" alt="CompTIA Cloud+ badge" width="64" height="64" loading="lazy" decoding="async">
+        <span>CompTIA Cloud+</span>
+       </a>
+      </li>
+      <li>
+       <a class="badge" href="https://www.credly.com/badges/<CCNP-ID>/public_url" target="_blank" rel="noopener">
+        <img src="assets/badges/cisco-ccnp.png" alt="Cisco CCNP Enterprise badge" width="64" height="64" loading="lazy" decoding="async">
+        <span>CCNP Enterprise</span>
+      </a>
+      </li>
+      <li>
+       <a class="badge" href="https://www.credly.com/badges/<SECURITY-ID>/public_url" target="_blank" rel="noopener">
+        <img src="assets/badges/comptia-casp.png" alt="CompTIA CASP+ (or Security+) badge" width="64" height="64" loading="lazy" decoding="async">
+        <span>CompTIA CASP+</span>
+       </a>
+      </li>
+     </ul>
+
+    <p class="muted">
+    <a href="https://www.credly.com/users/peterson-dorcelus/badges" target="_blank" rel="noopener">View all & verify on Credly</a>
+    </p>
+    </section>
+
+<style>
+.badge-row { display:flex; gap:.75rem; flex-wrap:wrap; padding:0; margin:.5rem 0 0; }
+.badge-row > li { list-style:none; }
+.badge {
+  display:flex; align-items:center; gap:.5rem;
+  padding:.4rem .6rem; border:1px solid var(--border, #e5e7eb);
+  border-radius:999px; text-decoration:none; background:var(--card, #fff);
+  box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.badge img { border-radius:6px; }
+.badge span { font-size:.9rem; color:var(--fg, #111827); white-space:nowrap; }
+@media (prefers-reduced-motion:no-preference) {
+  .badge:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(0,0,0,.06); }
+}
+</style>
+
 
     <!-- Projects -->
     <section id="projects" class="container" aria-labelledby="projects-h">
